@@ -15,7 +15,11 @@ dependencies:
 #  sqflite_common_ffi: ^1.0.0+2
   sqflite_sqlcipher: ^1.1.1
 
-  floor_annotation: any
+  floor_annotation:
+    git:
+      url: https://github.com/vitusortner/floor.git
+      path: floor_annotation
+      ref: develop
   meta: ^1.2.3
   flutter:
     sdk: flutter
@@ -33,4 +37,4 @@ dev_dependencies:
       ref: feature/0.14.0
 
   build_runner: ^1.7.3
-  matcher: ^0.12.6
+  matcher: ^0.12.9
