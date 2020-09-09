@@ -70,8 +70,6 @@ class _$FlutterDatabase extends FlutterDatabase {
 
   TaskDao _taskDaoInstance;
 
-  Task2Dao _task2DaoInstance;
-
   Future<sqflite.Database> open(
       String path, String password, List<Migration> migrations,
       [Callback callback]) async {
@@ -83,13 +81,10 @@ class _$FlutterDatabase extends FlutterDatabase {
     }, onUpgrade: (database, startVersion, endVersion) async {
       await MigrationAdapter.runMigrations(
           database, startVersion, endVersion, migrations);
-
       await callback?.onUpgrade?.call(database, startVersion, endVersion);
     }, onCreate: (database, version) async {
       await database.execute(
           'CREATE TABLE IF NOT EXISTS `Task` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `message` TEXT)');
-      await database.execute(
-          'CREATE TABLE IF NOT EXISTS `Task2` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `message` TEXT)');
 
       await callback?.onCreate?.call(database, version);
     });
@@ -99,102 +94,10 @@ class _$FlutterDatabase extends FlutterDatabase {
   TaskDao get taskDao {
     return _taskDaoInstance ??= _$TaskDao(database, changeListener);
   }
-
-  @override
-  Task2Dao get task2Dao {
-    return _task2DaoInstance ??= _$Task2Dao(database, changeListener);
-  }
 }
 
 class _$TaskDao extends TaskDao {
   _$TaskDao(this.database, this.changeListener)
-      : _queryAdapter = QueryAdapter(database, changeListener),
-        _taskInsertionAdapter = InsertionAdapter(
-            database,
-            'Task',
-            (Task item) =>
-                <String, dynamic>{'id': item.id, 'message': item.message},
-            changeListener),
-        _taskUpdateAdapter = UpdateAdapter(
-            database,
-            'Task',
-            ['id'],
-            (Task item) =>
-                <String, dynamic>{'id': item.id, 'message': item.message},
-            changeListener),
-        _taskDeletionAdapter = DeletionAdapter(
-            database,
-            'Task',
-            ['id'],
-            (Task item) =>
-                <String, dynamic>{'id': item.id, 'message': item.message},
-            changeListener);
-
-  final sqflite.DatabaseExecutor database;
-
-  final StreamController<String> changeListener;
-
-  final QueryAdapter _queryAdapter;
-
-  static final _taskMapper = (Map<String, dynamic> row) =>
-      Task(row['id'] as int, row['message'] as String);
-
-  final InsertionAdapter<Task> _taskInsertionAdapter;
-
-  final UpdateAdapter<Task> _taskUpdateAdapter;
-
-  final DeletionAdapter<Task> _taskDeletionAdapter;
-
-  @override
-  Future<Task> findTaskById(int id) async {
-    return _queryAdapter.query('SELECT * FROM task WHERE id = ?',
-        arguments: <dynamic>[id], mapper: _taskMapper);
-  }
-
-  @override
-  Future<List<Task>> findAllTasks() async {
-    return _queryAdapter.queryList('SELECT * FROM task', mapper: _taskMapper);
-  }
-
-  @override
-  Stream<List<Task>> findAllTasksAsStream() {
-    return _queryAdapter.queryListStream('SELECT * FROM task',
-        queryableName: 'Task', isView: false, mapper: _taskMapper);
-  }
-
-  @override
-  Future<void> insertTask(Task task) async {
-    await _taskInsertionAdapter.insert(task, OnConflictStrategy.abort);
-  }
-
-  @override
-  Future<void> insertTasks(List<Task> tasks) async {
-    await _taskInsertionAdapter.insertList(tasks, OnConflictStrategy.abort);
-  }
-
-  @override
-  Future<void> updateTask(Task task) async {
-    await _taskUpdateAdapter.update(task, OnConflictStrategy.abort);
-  }
-
-  @override
-  Future<void> updateTasks(List<Task> task) async {
-    await _taskUpdateAdapter.updateList(task, OnConflictStrategy.abort);
-  }
-
-  @override
-  Future<void> deleteTask(Task task) async {
-    await _taskDeletionAdapter.delete(task);
-  }
-
-  @override
-  Future<void> deleteTasks(List<Task> tasks) async {
-    await _taskDeletionAdapter.deleteList(tasks);
-  }
-}
-
-class _$Task2Dao extends Task2Dao {
-  _$Task2Dao(this.database, this.changeListener)
       : _queryAdapter = QueryAdapter(database, changeListener),
         _taskInsertionAdapter = InsertionAdapter(
             database,

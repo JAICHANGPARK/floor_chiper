@@ -76,9 +76,9 @@ class DatabaseWriter implements Writer {
   @nonNull
   Method _generateOpenMethod(final Database database) {
     final createTableStatements =
-        _generateCreateTableSqlStatements(database.entities)
-            .map((statement) => "await database.execute('$statement');")
-            .join('\n');
+    _generateCreateTableSqlStatements(database.entities)
+        .map((statement) => "await database.execute('$statement');")
+        .join('\n');
     final createIndexStatements = database.entities
         .map((entity) => entity.indices.map((index) => index.createQuery()))
         .expand((statements) => statements)
@@ -92,7 +92,7 @@ class DatabaseWriter implements Writer {
     final pathParameter = Parameter((builder) => builder
       ..name = 'path'
       ..type = refer('String'));
-      final pwdParameter = Parameter((builder) => builder
+    final pwdParameter = Parameter((builder) => builder
       ..name = 'password'
       ..type = refer('String'));
     final migrationsParameter = Parameter((builder) => builder
