@@ -20,13 +20,6 @@ dependencies:
   flutter:
     sdk: flutter
 
-dependency_overrides:
-  sqflite:
-    git:
-      url: https://www.github.com/davidmartos96/sqflite_sqlcipher.git
-      path: sqflite
-      ref: fmdb_override
-
 dev_dependencies:
   collection: ^1.14.11
   mockito: ^4.1.1

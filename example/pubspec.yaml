@@ -16,9 +16,19 @@ dependencies:
     path: ../floor/
   path: any
   path_provider: any
+  permission_handler: any
+
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
   floor_generator:
     path: ../floor_generator/
-  build_runner: ^1.7.3
+  build_runner: ^1.10.2
+
+dependency_overrides:
+  sqflite:
+    git:
+      url: https://www.github.com/davidmartos96/sqflite_sqlcipher.git
+      path: sqflite
+      ref: fmdb_override
