@@ -15,10 +15,7 @@ dependencies:
 #  sqflite_common_ffi: ^1.1.1
   sqflite_sqlcipher: ^1.1.1
   floor_annotation:
-    git:
-      url: https://github.com/vitusortner/floor.git
-      path: floor_annotation
-      ref: develop
+    path: ../floor_annotation/
 
   meta: ^1.2.3
   flutter:
@@ -31,10 +28,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   floor_generator:
-    git:
-      url: https://github.com/JAICHANGPARK/floor_chiper.git
-      path: floor_generator
-      ref: feature/0.17.0
+    path: ../floor_generator/
 
   build_runner: ^1.10.3
   matcher: ^0.12.9

@@ -135,7 +135,7 @@ As a consequence, it's necessary to have an understanding of SQL and SQLite in o
     // required package imports
     import 'dart:async';
     import 'package:floor/floor.dart';
-    import 'package:sqflite/sqflite.dart' as sqflite;
+    import 'package:sqflite_sqlcipher/sqflite.dart' as sqflite;
 
     import 'dao/person_dao.dart';
     import 'entity/person.dart';
