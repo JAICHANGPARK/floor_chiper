@@ -20,7 +20,10 @@ dependencies:
   dartx: ^0.5.0
 
   floor_annotation:
-    path: ../floor_annotation/
+    git:
+      url: https://github.com/vitusortner/floor.git
+      path: floor_annotation
+      ref: develop
 
 dev_dependencies:
   test: ^1.15.4
