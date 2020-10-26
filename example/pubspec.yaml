@@ -1,10 +1,12 @@
-name: example
+name: floor_chiper
 description: >
   The typesafe, reactive and lightweight SQLite abstraction for your Flutter applications.
   This is an example on how to use the library.
-version: 0.1.0
+version: 0.17.0
 homepage: https://github.com/vitusortner/floor
-author: vitusortner
+author:
+  - vitusortner
+  - Dreamwalker
 
 environment:
   sdk: '>=2.6.0 <3.0.0'
@@ -17,14 +19,22 @@ dependencies:
   path: any
   path_provider: any
   permission_handler: any
+  floor_annotation:
+    path: ../floor_annotation/
+  meta: ^1.2.3
 
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  collection: ^1.14.13
+  mockito: ^4.1.1
+  matcher: ^0.12.9
+  build_runner: ^1.10.3
+
   floor_generator:
     path: ../floor_generator/
-  build_runner: ^1.10.2
+
 
 dependency_overrides:
   sqflite:

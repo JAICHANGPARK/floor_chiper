@@ -5,21 +5,20 @@ import 'package:floor_generator/writer/writer.dart';
 class DatabaseBuilderWriter extends Writer {
   final String _databaseName;
 
-  DatabaseBuilderWriter(final String databaseName)
-      : _databaseName = databaseName;
+  DatabaseBuilderWriter(final String databaseName) : _databaseName = databaseName;
 
   @nonNull
   @override
   Class write() {
     final databaseBuilderName = '_\$${_databaseName}Builder';
 
-    final nameField = Field((builder) => builder
-      ..name = 'name'
+    final passwordField = Field((builder) => builder
+      ..name = 'password'
       ..type = refer('String')
       ..modifier = FieldModifier.final$);
 
-    final passwordField = Field((builder) => builder
-      ..name = 'password'
+    final nameField = Field((builder) => builder
+      ..name = 'name'
       ..type = refer('String')
       ..modifier = FieldModifier.final$);
 
@@ -34,12 +33,16 @@ class DatabaseBuilderWriter extends Writer {
       ..type = refer('Callback'));
 
     final constructor = Constructor((builder) => builder
-      ..requiredParameters.add(Parameter((builder) => builder
-        ..toThis = true
-        ..name = 'name'))
-      ..requiredParameters.add(Parameter((builder) => builder
-        ..toThis = true
-        ..name = 'password')));
+      ..requiredParameters.add(
+        Parameter((builder) => builder
+          ..toThis = true
+          ..name = 'name'),
+      )
+      ..requiredParameters.add(
+        Parameter((builder) => builder
+          ..toThis = true
+          ..name = 'password'),
+      ));
 
     final addMigrationsMethod = Method((builder) => builder
       ..name = 'addMigrations'
