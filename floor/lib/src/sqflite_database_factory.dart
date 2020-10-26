@@ -4,7 +4,6 @@ import 'package:path/path.dart';
 import 'package:sqflite_sqlcipher/sqflite.dart';
 import 'package:sqflite_sqlcipher/sqlite_api.dart';
 
-
 final sqfliteDatabaseFactory = () {
   if (Platform.isAndroid || Platform.isIOS) {
     return databaseFactory;

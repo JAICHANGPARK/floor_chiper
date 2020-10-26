@@ -1,21 +1,23 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:example/database.dart';
-import 'package:example/task.dart';
-import 'package:example/task_dao.dart';
+import 'package:floor_chiper/database.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+
 import 'package:permission_handler/permission_handler.dart';
 
 import 'package:sqflite_sqlcipher/sqflite.dart' as sqflite;
+
+import 'task.dart';
+import 'task_dao.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 //openDatabase("path",password: "");
   final database = await $FloorFlutterDatabase
-      .databaseBuilder('flutter_database.db', "myangel")
+      .databaseBuilder('flutter_database.db', "myangel",)
       .build();
   final dao = database.taskDao;
 
@@ -58,13 +60,13 @@ class _TasksWidgetState extends State<TasksWidget> {
 
   Future getPermission()async{
     if (await Permission.storage.request().isGranted) {
-    // Either the permission was already granted before or the user just granted it.
+      // Either the permission was already granted before or the user just granted it.
     }
 
 // You can request multiple permissions at once.
     Map<Permission, PermissionStatus> statuses = await [
-    Permission.location,
-    Permission.storage,
+      Permission.location,
+      Permission.storage,
     ].request();
 
     print(statuses[Permission.storage]);
@@ -80,10 +82,10 @@ class _TasksWidgetState extends State<TasksWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(widget.title),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.close),
-          onPressed: ()async {
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.close),
+            onPressed: ()async {
               String path =await sqflite.getDatabasesPath();
               path = join(path, 'flutter_database.db');
               print(path);
@@ -96,12 +98,9 @@ class _TasksWidgetState extends State<TasksWidget> {
               print(outPath);
               File file = File(outPath);
               file =  await file.writeAsBytes(dbData);
-
-
-
-          },
-        )
-      ],),
+            },
+          )
+        ],),
       body: SafeArea(
         child: Column(
           children: <Widget>[
