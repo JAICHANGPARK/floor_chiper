@@ -16,7 +16,7 @@ class FloorWriter extends Writer {
       ..name = 'databaseBuilder'
       ..lambda = true
       ..static = true
-      ..body = Code('$databaseBuilderName(name, password)')
+      ..body = Code('$databaseBuilderName(name)')
       ..returns = refer(databaseBuilderName)
       ..docs.addAll([
         r'/// Creates a database builder for a persistent database.',
@@ -24,12 +24,7 @@ class FloorWriter extends Writer {
       ])
       ..requiredParameters.add(Parameter((builder) => builder
         ..name = 'name'
-        ..type = refer('String')))
-      ..requiredParameters.add(Parameter((builder) => builder
-        ..name = 'password'
-        ..type = refer('String')))
-
-    );
+        ..type = refer('String'))));
 
     final inMemoryDatabaseBuilderMethod = Method((builder) => builder
       ..name = 'inMemoryDatabaseBuilder'
@@ -41,7 +36,7 @@ class FloorWriter extends Writer {
         '/// Information stored in an in memory database disappears when the process is killed.',
         '/// Once a database is built, you should keep a reference to it and re-use it.'
       ])
-      ..body = Code('$databaseBuilderName(null, null)'));
+      ..body = Code('$databaseBuilderName(null)'));
 
     return Class((builder) => builder
       ..name = '\$Floor$_databaseName'

@@ -19,13 +19,17 @@ extension TypeConverterElementExtension on Element {
           ?.map((object) => object.toTypeValue().element);
 
       if (typeConverterElements == null || typeConverterElements.isEmpty) {
-        throw InvalidGenerationSourceError('There are no type converts defined even though the @TypeConverters annotation is used.',
-            todo: 'Supply a type converter class to the annotation.', element: this);
+        throw InvalidGenerationSourceError(
+            'There are no type converts defined even though the @TypeConverters annotation is used.',
+            todo: 'Supply a type converter class to the annotation.',
+            element: this);
       }
 
-      final typeConverterClassElements = typeConverterElements.cast<ClassElement>();
+      final typeConverterClassElements =
+          typeConverterElements.cast<ClassElement>();
 
-      if (typeConverterClassElements.any((element) => !element.isTypeConverter)) {
+      if (typeConverterClassElements
+          .any((element) => !element.isTypeConverter)) {
         throw InvalidGenerationSourceError(
           'Only classes that inherit from TypeConverter can be used as type converters.',
           todo: 'Make sure use a class that inherits from TypeConverter.',
@@ -33,7 +37,9 @@ extension TypeConverterElementExtension on Element {
         );
       }
 
-      return typeConverterClassElements.map((element) => TypeConverterProcessor(element, scope).process()).toSet();
+      return typeConverterClassElements
+          .map((element) => TypeConverterProcessor(element, scope).process())
+          .toSet();
     } else {
       return {};
     }
