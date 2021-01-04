@@ -7,7 +7,7 @@ import 'package:sqflite_sqlcipher/sqlite_api.dart';
 final sqfliteDatabaseFactory = () {
   if (Platform.isAndroid || Platform.isIOS) {
     return databaseFactory;
-  }  else {
+  } else {
     throw UnsupportedError(
       'Platform ${Platform.operatingSystem} is not supported by Floor.',
     );
