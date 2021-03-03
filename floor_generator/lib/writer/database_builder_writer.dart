@@ -5,7 +5,8 @@ import 'package:floor_generator/writer/writer.dart';
 class DatabaseBuilderWriter extends Writer {
   final String _databaseName;
 
-  DatabaseBuilderWriter(final String databaseName) : _databaseName = databaseName;
+  DatabaseBuilderWriter(final String databaseName)
+      : _databaseName = databaseName;
 
   @nonNull
   @override
@@ -74,13 +75,9 @@ class DatabaseBuilderWriter extends Writer {
       ..modifier = MethodModifier.async
       ..docs.add('/// Creates the database and initializes it.')
       ..body = Code('''
-        String path;
-        if (name != null) {
-        path = await sqflite.getDatabasesPath();
-        path = join(path, name);
-        } else {
-        path = ':memory:';
-        }
+        final path = name != null
+          ? await sqfliteDatabaseFactory.getDatabasePath(name)
+          : ':memory:';
         final database = _\$$_databaseName();
         database.database = await database.open(
           path,

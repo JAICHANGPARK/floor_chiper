@@ -3,11 +3,15 @@ import 'dart:io';
 import 'package:path/path.dart';
 import 'package:sqflite_sqlcipher/sqflite.dart';
 import 'package:sqflite_sqlcipher/sqlite_api.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 final sqfliteDatabaseFactory = () {
   if (Platform.isAndroid || Platform.isIOS) {
     return databaseFactory;
-  }  else {
+  } else if (Platform.isLinux || Platform.isMacOS || Platform.isWindows) {
+    sqfliteFfiInit();
+    return databaseFactoryFfi;
+  } else {
     throw UnsupportedError(
       'Platform ${Platform.operatingSystem} is not supported by Floor.',
     );
@@ -16,6 +20,6 @@ final sqfliteDatabaseFactory = () {
 
 extension DatabaseFactoryExtension on DatabaseFactory {
   Future<String> getDatabasePath(final String name) async {
-    return join(await getDatabasesPath(), name);
+    return join(await this.getDatabasesPath(), name);
   }
 }

@@ -28,7 +28,8 @@ void main() {
     ''');
 
     final actual =
-        QueryMethodProcessor(methodElement, [...entities, ...views]).process();
+        QueryMethodProcessor(methodElement, [...entities, ...views], {})
+            .process();
 
     expect(
       actual,
@@ -41,6 +42,7 @@ void main() {
           await getDartTypeWithPerson('Person'),
           [],
           entities.first,
+          {},
         ),
       ),
     );
@@ -53,7 +55,8 @@ void main() {
     ''');
 
     final actual =
-        QueryMethodProcessor(methodElement, [...entities, ...views]).process();
+        QueryMethodProcessor(methodElement, [...entities, ...views], {})
+            .process();
 
     expect(
       actual,
@@ -66,6 +69,7 @@ void main() {
           await getDartTypeWithName('Name'),
           [],
           views.first,
+          {},
         ),
       ),
     );
@@ -78,7 +82,8 @@ void main() {
       Future<Person> findPerson(int id);
     ''');
 
-      final actual = QueryMethodProcessor(methodElement, []).process().query;
+      final actual =
+          QueryMethodProcessor(methodElement, [], {}).process().query;
 
       expect(actual, equals('SELECT * FROM Person WHERE id = ?'));
     });
@@ -92,7 +97,8 @@ void main() {
         Future<Person> findPersonByIdAndName(int id, String name);
       """);
 
-      final actual = QueryMethodProcessor(methodElement, []).process().query;
+      final actual =
+          QueryMethodProcessor(methodElement, [], {}).process().query;
 
       expect(
         actual,
@@ -107,7 +113,8 @@ void main() {
         Future<Person> findPersonByIdAndName(int id, String name);    
       ''');
 
-      final actual = QueryMethodProcessor(methodElement, []).process().query;
+      final actual =
+          QueryMethodProcessor(methodElement, [], {}).process().query;
 
       expect(
         actual,
@@ -121,11 +128,42 @@ void main() {
       Future<void> setRated(List<int> ids);
     ''');
 
-      final actual = QueryMethodProcessor(methodElement, []).process().query;
+      final actual =
+          QueryMethodProcessor(methodElement, [], {}).process().query;
 
       expect(
         actual,
-        equals(r'update sports set rated = 1 where id in ($valueList1)'),
+        equals(r'update sports set rated = 1 where id in ($valueList0)'),
+      );
+    });
+
+    test('parses IN clause without space after IN', () async {
+      final methodElement = await _createQueryMethodElement('''
+      @Query('update sports set rated = 1 where id in(:ids)')
+      Future<void> setRated(List<int> ids);
+    ''');
+
+      final actual =
+          QueryMethodProcessor(methodElement, [], {}).process().query;
+
+      expect(
+        actual,
+        equals(r'update sports set rated = 1 where id in($valueList0)'),
+      );
+    });
+
+    test('parses IN clause with multiple spaces after IN', () async {
+      final methodElement = await _createQueryMethodElement('''
+      @Query('update sports set rated = 1 where id in      (:ids)')
+      Future<void> setRated(List<int> ids);
+    ''');
+
+      final actual =
+          QueryMethodProcessor(methodElement, [], {}).process().query;
+
+      expect(
+        actual,
+        equals(r'update sports set rated = 1 where id in ($valueList0)'),
       );
     });
 
@@ -135,13 +173,14 @@ void main() {
       Future<void> setRated(List<int> ids, List<int> bar);
     ''');
 
-      final actual = QueryMethodProcessor(methodElement, []).process().query;
+      final actual =
+          QueryMethodProcessor(methodElement, [], {}).process().query;
 
       expect(
         actual,
         equals(
-          r'update sports set rated = 1 where id in ($valueList1) '
-          r'and where foo in ($valueList2)',
+          r'update sports set rated = 1 where id in ($valueList0) '
+          r'and where foo in ($valueList1)',
         ),
       );
     });
@@ -152,12 +191,13 @@ void main() {
       Future<void> setRated(List<int> ids, int bar);
     ''');
 
-      final actual = QueryMethodProcessor(methodElement, []).process().query;
+      final actual =
+          QueryMethodProcessor(methodElement, [], {}).process().query;
 
       expect(
         actual,
         equals(
-          r'update sports set rated = 1 where id in ($valueList1) '
+          r'update sports set rated = 1 where id in ($valueList0) '
           r'AND foo = ?',
         ),
       );
@@ -169,7 +209,8 @@ void main() {
       Future<List<Person>> findPersonsWithNamesLike(String name);
     ''');
 
-      final actual = QueryMethodProcessor(methodElement, []).process().query;
+      final actual =
+          QueryMethodProcessor(methodElement, [], {}).process().query;
 
       expect(actual, equals('SELECT * FROM Persons WHERE name LIKE ?'));
     });
@@ -180,7 +221,8 @@ void main() {
       Future<List<Person>> findPersonsWithNamesLike(String table, String otherTable);
     ''');
 
-      final actual = QueryMethodProcessor(methodElement, []).process().query;
+      final actual =
+          QueryMethodProcessor(methodElement, [], {}).process().query;
 
       expect(actual, equals('SELECT * FROM ?, ?'));
     });
@@ -194,7 +236,7 @@ void main() {
     ''');
 
       final actual = () =>
-          QueryMethodProcessor(methodElement, [...entities, ...views])
+          QueryMethodProcessor(methodElement, [...entities, ...views], {})
               .process();
 
       final error =
@@ -209,7 +251,7 @@ void main() {
     ''');
 
       final actual = () =>
-          QueryMethodProcessor(methodElement, [...entities, ...views])
+          QueryMethodProcessor(methodElement, [...entities, ...views], {})
               .process();
 
       final error = QueryMethodProcessorError(methodElement).noQueryDefined;
@@ -223,7 +265,7 @@ void main() {
     ''');
 
       final actual = () =>
-          QueryMethodProcessor(methodElement, [...entities, ...views])
+          QueryMethodProcessor(methodElement, [...entities, ...views], {})
               .process();
 
       final error = QueryMethodProcessorError(methodElement).noQueryDefined;
@@ -238,7 +280,7 @@ void main() {
     ''');
 
       final actual = () =>
-          QueryMethodProcessor(methodElement, [...entities, ...views])
+          QueryMethodProcessor(methodElement, [...entities, ...views], {})
               .process();
 
       final error = QueryMethodProcessorError(methodElement)
@@ -254,7 +296,7 @@ void main() {
     ''');
 
       final actual = () =>
-          QueryMethodProcessor(methodElement, [...entities, ...views])
+          QueryMethodProcessor(methodElement, [...entities, ...views], {})
               .process();
 
       final error = QueryMethodProcessorError(methodElement)
@@ -321,7 +363,7 @@ Future<List<Entity>> _getEntities() async {
 
   return library.classes
       .where((classElement) => classElement.hasAnnotation(annotations.Entity))
-      .map((classElement) => EntityProcessor(classElement).process())
+      .map((classElement) => EntityProcessor(classElement, {}).process())
       .toList();
 }
 
@@ -344,6 +386,6 @@ Future<List<View>> _getViews() async {
   return library.classes
       .where((classElement) =>
           classElement.hasAnnotation(annotations.DatabaseView))
-      .map((classElement) => ViewProcessor(classElement).process())
+      .map((classElement) => ViewProcessor(classElement, {}).process())
       .toList();
 }

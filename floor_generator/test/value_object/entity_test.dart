@@ -1,7 +1,10 @@
+import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/constants.dart';
+import 'package:floor_generator/misc/extension/foreign_key_action_extension.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/foreign_key.dart';
+import 'package:floor_generator/value_object/fts.dart';
 import 'package:floor_generator/value_object/primary_key.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
@@ -19,6 +22,7 @@ void main() {
     'field1ColumnName',
     false,
     SqlType.integer,
+    null,
   );
   final nullableField = Field(
     mockFieldElement,
@@ -26,6 +30,7 @@ void main() {
     'field2ColumnName',
     true,
     SqlType.text,
+    null,
   );
   final allFields = [field, nullableField];
 
@@ -50,6 +55,8 @@ void main() {
         [],
         false,
         '',
+        '',
+        null,
       );
 
       final actual = entity.getCreateTableStatement();
@@ -72,6 +79,8 @@ void main() {
         [],
         false,
         '',
+        '',
+        null,
       );
 
       final actual = entity.getCreateTableStatement();
@@ -95,6 +104,8 @@ void main() {
         [],
         false,
         '',
+        '',
+        null,
       );
 
       final actual = entity.getCreateTableStatement();
@@ -114,8 +125,8 @@ void main() {
         'parentName',
         ['parentColumn'],
         ['childColumn'],
-        'foo',
-        'bar',
+        annotations.ForeignKeyAction.cascade,
+        annotations.ForeignKeyAction.noAction,
       );
       final primaryKey = PrimaryKey([nullableField], true);
       final entity = Entity(
@@ -127,6 +138,8 @@ void main() {
         [],
         false,
         '',
+        '',
+        null,
       );
 
       final actual = entity.getCreateTableStatement();
@@ -136,8 +149,39 @@ void main() {
           'FOREIGN KEY (`${foreignKey.childColumns[0]}`) '
           'REFERENCES `${foreignKey.parentName}` '
           '(`${foreignKey.parentColumns[0]}`) '
-          'ON UPDATE ${foreignKey.onUpdate} '
-          'ON DELETE ${foreignKey.onDelete}'
+          'ON UPDATE ${foreignKey.onUpdate.toSql()} '
+          'ON DELETE ${foreignKey.onDelete.toSql()}'
+          ')';
+      expect(actual, equals(expected));
+    });
+  });
+
+  group('Fts key', () {
+    test('Create table statement with fts key', () {
+      final fts = Fts4(
+        'porter',
+        [],
+      );
+      final primaryKey = PrimaryKey([], true);
+      final entity = Entity(
+        mockClassElement,
+        'entityName',
+        [nullableField],
+        primaryKey,
+        [],
+        [],
+        false,
+        '',
+        '',
+        fts,
+      );
+
+      final actual = entity.getCreateTableStatement();
+
+      final expected = 'CREATE VIRTUAL TABLE IF NOT EXISTS `${entity.name}` '
+          'USING fts4'
+          '(`${nullableField.columnName}` ${nullableField.sqlType}, '
+          'tokenize=porter '
           ')';
       expect(actual, equals(expected));
     });
@@ -154,6 +198,8 @@ void main() {
       [],
       true,
       '',
+      '',
+      null,
     );
 
     final actual = entity.getCreateTableStatement();
@@ -164,69 +210,5 @@ void main() {
         'PRIMARY KEY (`${field.columnName}`)'
         ') WITHOUT ROWID';
     expect(actual, equals(expected));
-  });
-
-  group('Value mapping', () {
-    final primaryKey = PrimaryKey([nullableField], true);
-    final entity = Entity(
-      mockClassElement,
-      'entityName',
-      [nullableField],
-      primaryKey,
-      [],
-      [],
-      false,
-      '',
-    );
-    const fieldElementDisplayName = 'foo';
-
-    setUp(() {
-      when(mockFieldElement.displayName).thenReturn(fieldElementDisplayName);
-      when(mockFieldElement.type).thenReturn(mockDartType);
-    });
-
-    test('Get value mapping', () {
-      when(mockDartType.isDartCoreBool).thenReturn(false);
-
-      final actual = entity.getValueMapping();
-
-      final expected = '<String, dynamic>{'
-          "'${nullableField.columnName}': item.$fieldElementDisplayName"
-          '}';
-      expect(actual, equals(expected));
-    });
-
-    test('Get nullable boolean value mapping', () {
-      when(mockDartType.isDartCoreBool).thenReturn(true);
-
-      final actual = entity.getValueMapping();
-
-      final expected = '<String, dynamic>{'
-          "'${nullableField.columnName}': item.$fieldElementDisplayName == null ? null : (item.$fieldElementDisplayName ? 1 : 0)"
-          '}';
-      expect(actual, equals(expected));
-    });
-
-    test('Get non-nullable boolean value mapping', () {
-      final entity = Entity(
-        mockClassElement,
-        'entityName',
-        [nullableField, field],
-        primaryKey,
-        [],
-        [],
-        false,
-        '',
-      );
-      when(mockDartType.isDartCoreBool).thenReturn(true);
-
-      final actual = entity.getValueMapping();
-
-      final expected = '<String, dynamic>{'
-          "'${nullableField.columnName}': item.$fieldElementDisplayName == null ? null : (item.$fieldElementDisplayName ? 1 : 0),"
-          " '${field.columnName}': item.$fieldElementDisplayName ? 1 : 0"
-          '}';
-      expect(actual, equals(expected));
-    });
   });
 }

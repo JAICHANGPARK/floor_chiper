@@ -20,6 +20,8 @@ Future<void> main() async {
       .databaseBuilder('flutter_database.db', "myangel",)
       .build();
   final dao = database.taskDao;
+  int version = await database.version();
+  print("Database Version : ${version}");
 
   runApp(FloorApp(dao));
 }

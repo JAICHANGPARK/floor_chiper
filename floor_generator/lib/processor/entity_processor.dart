@@ -4,14 +4,15 @@ import 'package:dartx/dartx.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/misc/constants.dart';
+import 'package:floor_generator/misc/extension/dart_object_extension.dart';
 import 'package:floor_generator/misc/extension/type_converters_extension.dart';
-import 'package:floor_generator/misc/foreign_key_action.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/processor/error/entity_processor_error.dart';
 import 'package:floor_generator/processor/queryable_processor.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/field.dart';
 import 'package:floor_generator/value_object/foreign_key.dart';
+import 'package:floor_generator/value_object/fts.dart';
 import 'package:floor_generator/value_object/index.dart';
 import 'package:floor_generator/value_object/primary_key.dart';
 import 'package:floor_generator/value_object/type_converter.dart';
@@ -47,6 +48,7 @@ class EntityProcessor extends QueryableProcessor<Entity> {
       _getWithoutRowid(),
       getConstructor(fields),
       _getValueMapping(fields),
+      _getFts(),
     );
   }
 
@@ -92,13 +94,11 @@ class EntityProcessor extends QueryableProcessor<Entity> {
             throw _processorError.missingParentColumns;
           }
 
-          final onUpdateAnnotationValue =
-              foreignKeyObject.getField(ForeignKeyField.onUpdate)?.toIntValue();
-          final onUpdate = ForeignKeyAction.getString(onUpdateAnnotationValue);
+          final onUpdate =
+              _getForeignKeyAction(foreignKeyObject, ForeignKeyField.onUpdate);
 
-          final onDeleteAnnotationValue =
-              foreignKeyObject.getField(ForeignKeyField.onDelete)?.toIntValue();
-          final onDelete = ForeignKeyAction.getString(onDeleteAnnotationValue);
+          final onDelete =
+              _getForeignKeyAction(foreignKeyObject, ForeignKeyField.onDelete);
 
           return ForeignKey(
             parentName,
@@ -109,6 +109,51 @@ class EntityProcessor extends QueryableProcessor<Entity> {
           );
         })?.toList() ??
         [];
+  }
+
+  @nullable
+  Fts _getFts() {
+    if (classElement.hasAnnotation(annotations.Fts3)) {
+      return _getFts3();
+    } else if (classElement.hasAnnotation(annotations.Fts4)) {
+      return _getFts4();
+    } else {
+      return null;
+    }
+  }
+
+  Fts _getFts3() {
+    final ftsObject = classElement.getAnnotation(annotations.Fts3);
+
+    final tokenizer =
+        ftsObject?.getField(Fts3Field.tokenizer)?.toStringValue() ??
+            annotations.FtsTokenizer.simple;
+
+    final tokenizerArgs = ftsObject
+            .getField(Fts3Field.tokenizerArgs)
+            ?.toListValue()
+            ?.map((object) => object.toStringValue())
+            ?.toList() ??
+        [];
+
+    return Fts3(tokenizer, tokenizerArgs);
+  }
+
+  Fts _getFts4() {
+    final ftsObject = classElement.getAnnotation(annotations.Fts4);
+
+    final tokenizer =
+        ftsObject?.getField(Fts4Field.tokenizer)?.toStringValue() ??
+            annotations.FtsTokenizer.simple;
+
+    final tokenizerArgs = ftsObject
+            .getField(Fts4Field.tokenizerArgs)
+            ?.toListValue()
+            ?.map((object) => object.toStringValue())
+            ?.toList() ??
+        [];
+
+    return Fts4(tokenizer, tokenizerArgs);
   }
 
   @nonNull
@@ -266,5 +311,19 @@ class EntityProcessor extends QueryableProcessor<Entity> {
     } else {
       return attributeValue;
     }
+  }
+
+  @nonNull
+  annotations.ForeignKeyAction _getForeignKeyAction(
+      DartObject foreignKeyObject, String triggerName) {
+    final field = foreignKeyObject.getField(triggerName);
+    if (field == null) {
+      // field was not defined, return default value
+      return annotations.ForeignKeyAction.noAction;
+    }
+
+    return field.toForeignKeyAction(
+        orElse: () =>
+            throw _processorError.wrongForeignKeyAction(field, triggerName));
   }
 }

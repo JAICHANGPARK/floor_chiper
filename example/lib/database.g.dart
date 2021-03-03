@@ -9,15 +9,12 @@ part of 'database.dart';
 class $FloorFlutterDatabase {
   /// Creates a database builder for a persistent database.
   /// Once a database is built, you should keep a reference to it and re-use it.
-  static _$FlutterDatabaseBuilder databaseBuilder(
-          String name, String password) =>
-      _$FlutterDatabaseBuilder(name, password);
+  static _$FlutterDatabaseBuilder databaseBuilder(String name, String password) => _$FlutterDatabaseBuilder(name, password);
 
   /// Creates a database builder for an in memory database.
   /// Information stored in an in memory database disappears when the process is killed.
   /// Once a database is built, you should keep a reference to it and re-use it.
-  static _$FlutterDatabaseBuilder inMemoryDatabaseBuilder() =>
-      _$FlutterDatabaseBuilder(null, null);
+  static _$FlutterDatabaseBuilder inMemoryDatabaseBuilder() => _$FlutterDatabaseBuilder(null, null);
 }
 
 class _$FlutterDatabaseBuilder {
@@ -45,14 +42,10 @@ class _$FlutterDatabaseBuilder {
 
   /// Creates the database and initializes it.
   Future<FlutterDatabase> build() async {
-    String path;
-    if (name != null) {
-      path = await sqflite.getDatabasesPath();
-      path = join(path, name);
-    } else {
-      path = ':memory:';
-    }
+    final path = name != null ? await sqfliteDatabaseFactory.getDatabasePath(name) : ':memory:';
+    print(path);
     final database = _$FlutterDatabase();
+
     database.database = await database.open(
       path,
       password,
@@ -61,6 +54,7 @@ class _$FlutterDatabaseBuilder {
     );
     return database;
   }
+
 }
 
 class _$FlutterDatabase extends FlutterDatabase {
@@ -72,9 +66,7 @@ class _$FlutterDatabase extends FlutterDatabase {
 
   Task2Dao _task2DaoInstance;
 
-  Future<sqflite.Database> open(
-      String path, String password, List<Migration> migrations,
-      [Callback callback]) async {
+  Future<sqflite.Database> open(String path, String password, List<Migration> migrations, [Callback callback]) async {
     return sqflite.openDatabase(
       path,
       password: password,
@@ -86,16 +78,12 @@ class _$FlutterDatabase extends FlutterDatabase {
         await callback?.onOpen?.call(database);
       },
       onUpgrade: (database, startVersion, endVersion) async {
-        await MigrationAdapter.runMigrations(
-            database, startVersion, endVersion, migrations);
-
+        await MigrationAdapter.runMigrations(database, startVersion, endVersion, migrations);
         await callback?.onUpgrade?.call(database, startVersion, endVersion);
       },
       onCreate: (database, version) async {
-        await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Task` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `message` TEXT)');
-        await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Task2` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `message` TEXT)');
+        await database.execute('CREATE TABLE IF NOT EXISTS `Task` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `message` TEXT)');
+        await database.execute('CREATE TABLE IF NOT EXISTS `Task2` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `message` TEXT)');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -116,26 +104,12 @@ class _$FlutterDatabase extends FlutterDatabase {
 class _$TaskDao extends TaskDao {
   _$TaskDao(this.database, this.changeListener)
       : _queryAdapter = QueryAdapter(database, changeListener),
-        _taskInsertionAdapter = InsertionAdapter(
-            database,
-            'Task',
-            (Task item) =>
-                <String, dynamic>{'id': item.id, 'message': item.message},
-            changeListener),
+        _taskInsertionAdapter =
+            InsertionAdapter(database, 'Task', (Task item) => <String, dynamic>{'id': item.id, 'message': item.message}, changeListener),
         _taskUpdateAdapter = UpdateAdapter(
-            database,
-            'Task',
-            ['id'],
-            (Task item) =>
-                <String, dynamic>{'id': item.id, 'message': item.message},
-            changeListener),
+            database, 'Task', ['id'], (Task item) => <String, dynamic>{'id': item.id, 'message': item.message}, changeListener),
         _taskDeletionAdapter = DeletionAdapter(
-            database,
-            'Task',
-            ['id'],
-            (Task item) =>
-                <String, dynamic>{'id': item.id, 'message': item.message},
-            changeListener);
+            database, 'Task', ['id'], (Task item) => <String, dynamic>{'id': item.id, 'message': item.message}, changeListener);
 
   final sqflite.DatabaseExecutor database;
 
@@ -152,25 +126,19 @@ class _$TaskDao extends TaskDao {
   @override
   Future<Task> findTaskById(int id) async {
     return _queryAdapter.query('SELECT * FROM task WHERE id = ?',
-        arguments: <dynamic>[id],
-        mapper: (Map<String, dynamic> row) =>
-            Task(row['id'] as int, row['message'] as String));
+        arguments: <dynamic>[id], mapper: (Map<String, dynamic> row) => Task(row['id'] as int, row['message'] as String));
   }
 
   @override
   Future<List<Task>> findAllTasks() async {
     return _queryAdapter.queryList('SELECT * FROM task',
-        mapper: (Map<String, dynamic> row) =>
-            Task(row['id'] as int, row['message'] as String));
+        mapper: (Map<String, dynamic> row) => Task(row['id'] as int, row['message'] as String));
   }
 
   @override
   Stream<List<Task>> findAllTasksAsStream() {
     return _queryAdapter.queryListStream('SELECT * FROM task',
-        queryableName: 'Task',
-        isView: false,
-        mapper: (Map<String, dynamic> row) =>
-            Task(row['id'] as int, row['message'] as String));
+        queryableName: 'Task', isView: false, mapper: (Map<String, dynamic> row) => Task(row['id'] as int, row['message'] as String));
   }
 
   @override
@@ -207,26 +175,12 @@ class _$TaskDao extends TaskDao {
 class _$Task2Dao extends Task2Dao {
   _$Task2Dao(this.database, this.changeListener)
       : _queryAdapter = QueryAdapter(database, changeListener),
-        _taskInsertionAdapter = InsertionAdapter(
-            database,
-            'Task',
-            (Task item) =>
-                <String, dynamic>{'id': item.id, 'message': item.message},
-            changeListener),
+        _taskInsertionAdapter =
+            InsertionAdapter(database, 'Task', (Task item) => <String, dynamic>{'id': item.id, 'message': item.message}, changeListener),
         _taskUpdateAdapter = UpdateAdapter(
-            database,
-            'Task',
-            ['id'],
-            (Task item) =>
-                <String, dynamic>{'id': item.id, 'message': item.message},
-            changeListener),
+            database, 'Task', ['id'], (Task item) => <String, dynamic>{'id': item.id, 'message': item.message}, changeListener),
         _taskDeletionAdapter = DeletionAdapter(
-            database,
-            'Task',
-            ['id'],
-            (Task item) =>
-                <String, dynamic>{'id': item.id, 'message': item.message},
-            changeListener);
+            database, 'Task', ['id'], (Task item) => <String, dynamic>{'id': item.id, 'message': item.message}, changeListener);
 
   final sqflite.DatabaseExecutor database;
 
@@ -243,25 +197,19 @@ class _$Task2Dao extends Task2Dao {
   @override
   Future<Task> findTaskById(int id) async {
     return _queryAdapter.query('SELECT * FROM task WHERE id = ?',
-        arguments: <dynamic>[id],
-        mapper: (Map<String, dynamic> row) =>
-            Task(row['id'] as int, row['message'] as String));
+        arguments: <dynamic>[id], mapper: (Map<String, dynamic> row) => Task(row['id'] as int, row['message'] as String));
   }
 
   @override
   Future<List<Task>> findAllTasks() async {
     return _queryAdapter.queryList('SELECT * FROM task',
-        mapper: (Map<String, dynamic> row) =>
-            Task(row['id'] as int, row['message'] as String));
+        mapper: (Map<String, dynamic> row) => Task(row['id'] as int, row['message'] as String));
   }
 
   @override
   Stream<List<Task>> findAllTasksAsStream() {
     return _queryAdapter.queryListStream('SELECT * FROM task',
-        queryableName: 'Task',
-        isView: false,
-        mapper: (Map<String, dynamic> row) =>
-            Task(row['id'] as int, row['message'] as String));
+        queryableName: 'Task', isView: false, mapper: (Map<String, dynamic> row) => Task(row['id'] as int, row['message'] as String));
   }
 
   @override

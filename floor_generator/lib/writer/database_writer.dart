@@ -56,8 +56,7 @@ class DatabaseWriter implements Writer {
         ..type = MethodType.getter
         ..returns = refer(daoTypeName)
         ..name = daoGetterName
-        ..body = Code(
-            'return _${daoGetterName}Instance ??= _\$$daoTypeName(database, changeListener);'));
+        ..body = Code('return _${daoGetterName}Instance ??= _\$$daoTypeName(database, changeListener);'));
     }).toList();
   }
 
@@ -76,9 +75,7 @@ class DatabaseWriter implements Writer {
   @nonNull
   Method _generateOpenMethod(final Database database) {
     final createTableStatements =
-        _generateCreateTableSqlStatements(database.entities)
-            .map((statement) => "await database.execute('$statement');")
-            .join('\n');
+        _generateCreateTableSqlStatements(database.entities).map((statement) => "await database.execute('$statement');").join('\n');
     final createIndexStatements = database.entities
         .map((entity) => entity.indices.map((index) => index.createQuery()))
         .expand((statements) => statements)
@@ -111,7 +108,7 @@ class DatabaseWriter implements Writer {
       ..requiredParameters.addAll([pathParameter, pwdParameter, migrationsParameter])
       ..optionalParameters.add(callbackParameter)
       ..body = Code('''
-            return sqflite.openDatabase(path, password: password, 
+         return sqflite.openDatabase(path, password: password, 
            version: ${database.version},
             onConfigure: (database) async {
               await database.execute('PRAGMA foreign_keys = ON');
@@ -121,18 +118,15 @@ class DatabaseWriter implements Writer {
             },
             onUpgrade: (database, startVersion, endVersion) async {
               await MigrationAdapter.runMigrations(database, startVersion, endVersion, migrations);
-
               await callback?.onUpgrade?.call(database, startVersion, endVersion);
             },
             onCreate: (database, version) async {
               $createTableStatements
               $createIndexStatements
               $createViewStatements
-
               await callback?.onCreate?.call(database, version);
             },
           );
-       
           '''));
   }
 

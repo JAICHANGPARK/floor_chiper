@@ -22,13 +22,13 @@ class FloorWriter extends Writer {
         r'/// Creates a database builder for a persistent database.',
         '/// Once a database is built, you should keep a reference to it and re-use it.'
       ])
+
       ..requiredParameters.add(Parameter((builder) => builder
         ..name = 'name'
         ..type = refer('String')))
       ..requiredParameters.add(Parameter((builder) => builder
         ..name = 'password'
         ..type = refer('String')))
-
     );
 
     final inMemoryDatabaseBuilderMethod = Method((builder) => builder

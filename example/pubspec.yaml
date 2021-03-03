@@ -2,7 +2,7 @@ name: floor_chiper
 description: >
   The typesafe, reactive and lightweight SQLite abstraction for your Flutter applications.
   This is an example on how to use the library.
-version: 0.17.0
+version: 0.19.1
 homepage: https://github.com/vitusortner/floor
 author:
   - vitusortner
@@ -43,3 +43,7 @@ dependency_overrides:
       url: https://www.github.com/davidmartos96/sqflite_sqlcipher.git
       path: sqflite
       ref: fmdb_override
+
+
+flutter:
+  uses-material-design: true
