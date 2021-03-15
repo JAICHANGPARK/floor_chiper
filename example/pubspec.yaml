@@ -4,7 +4,9 @@ description: >
   This is an example on how to use the library.
 version: 1.0.0
 homepage: https://github.com/vitusortner/floor
-author: vitusortner
+author:
+  - vitusortner
+  - Dreamwalker
 publish_to: none
 
 environment:

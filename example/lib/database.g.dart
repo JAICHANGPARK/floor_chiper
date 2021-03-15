@@ -9,15 +9,15 @@ part of 'database.dart';
 class $FloorFlutterDatabase {
   /// Creates a database builder for a persistent database.
   /// Once a database is built, you should keep a reference to it and re-use it.
-  static _$FlutterDatabaseBuilder databaseBuilder(
+  static _$FlutterDatabaseBuil-der databaseBuilder(
           String name, String password) =>
-      _$FlutterDatabaseBuilder(name);
+      _$FlutterDatabaseBuilder(name, password);
 
   /// Creates a database builder for an in memory database.
   /// Information stored in an in memory database disappears when the process is killed.
   /// Once a database is built, you should keep a reference to it and re-use it.
   static _$FlutterDatabaseBuilder inMemoryDatabaseBuilder() =>
-      _$FlutterDatabaseBuilder(null);
+      _$FlutterDatabaseBuilder(null, null);
 }
 
 class _$FlutterDatabaseBuilder {
@@ -89,7 +89,7 @@ class _$FlutterDatabase extends FlutterDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Task` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `message` TEXT NOT NULL)');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Task2` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `message` TEXT NOT NULL)');
+            'CREATE TABLE IF NOT EXISTS `Task2` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `message` TEXT NOT NULL)');
 
         await callback?.onCreate?.call(database, version);
       },
