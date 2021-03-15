@@ -1,5 +1,15 @@
 # Changelog
 
+# 1.0.0
+
+### Changes
+
+* Use stable Dart 2.12.0
+
+### 🚀 Features
+
+* Make floor null-safe
+
 # 0.19.1
 
 ### Changes
@@ -84,7 +94,8 @@
 
 ### ⚠️ Breaking Changes
 
-**You need to migrate the explicit usages of `OnConflictStrategy` and `ForeignKeyAction` from snake case to camel case.**
+**You need to migrate the explicit usages of `OnConflictStrategy` and `ForeignKeyAction` from snake case to camel
+case.**
 
 * Apply camel case to constants
 

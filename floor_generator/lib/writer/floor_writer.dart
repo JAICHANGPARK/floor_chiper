@@ -1,5 +1,5 @@
+// ignore_for_file: import_of_legacy_library_into_null_safe
 import 'package:code_builder/code_builder.dart';
-import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/writer/writer.dart';
 
 class FloorWriter extends Writer {
@@ -7,7 +7,6 @@ class FloorWriter extends Writer {
 
   FloorWriter(final String databaseName) : _databaseName = databaseName;
 
-  @nonNull
   @override
   Class write() {
     final databaseBuilderName = '_\$${_databaseName}Builder';
@@ -16,13 +15,12 @@ class FloorWriter extends Writer {
       ..name = 'databaseBuilder'
       ..lambda = true
       ..static = true
-      ..body = Code('$databaseBuilderName(name, password)')
+      ..body = Code('$databaseBuilderName(name)')
       ..returns = refer(databaseBuilderName)
       ..docs.addAll([
         r'/// Creates a database builder for a persistent database.',
         '/// Once a database is built, you should keep a reference to it and re-use it.'
       ])
-
       ..requiredParameters.add(Parameter((builder) => builder
         ..name = 'name'
         ..type = refer('String')))
@@ -41,7 +39,7 @@ class FloorWriter extends Writer {
         '/// Information stored in an in memory database disappears when the process is killed.',
         '/// Once a database is built, you should keep a reference to it and re-use it.'
       ])
-      ..body = Code('$databaseBuilderName(null, null)'));
+      ..body = Code('$databaseBuilderName(null)'));
 
     return Class((builder) => builder
       ..name = '\$Floor$_databaseName'
