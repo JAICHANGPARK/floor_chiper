@@ -93,7 +93,7 @@ class _TasksWidgetState extends State<TasksWidget> {
               print(path);
               File dbFile = File(path);
               Uint8List dbData = await dbFile.readAsBytes();
-              Directory s = await getExternalStorageDirectory();
+              final Directory s = (await getExternalStorageDirectory())!;
               String outPath = s.path;
               print(outPath);
               outPath = join(s.path, "flutter_database.db");

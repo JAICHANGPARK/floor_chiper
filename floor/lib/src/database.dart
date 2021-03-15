@@ -17,16 +17,16 @@ abstract class FloorDatabase {
   Future<void> close() async {
     await changeListener.close();
 
-    final immutableDatabase = database;
-    if (immutableDatabase is sqflite.Database && (immutableDatabase.isOpen ?? false)) {
-      await immutableDatabase.close();
+    final database = this.database;
+    if (database is sqflite.Database && database.isOpen) {
+      await database.close();
     }
   }
 
   Future<int> version() async {
-    final immutableDatabase = database;
-    if (immutableDatabase is sqflite.Database && (immutableDatabase.isOpen ?? false)) {
-     return await immutableDatabase.getVersion();
+    final database = this.database;
+    if (database is sqflite.Database && database.isOpen) {
+     return await database.getVersion();
     }else{
       return 0;
     }

@@ -9,7 +9,7 @@ part of 'database.dart';
 class $FloorFlutterDatabase {
   /// Creates a database builder for a persistent database.
   /// Once a database is built, you should keep a reference to it and re-use it.
-  static _$FlutterDatabaseBuil-der databaseBuilder(
+  static _$FlutterDatabaseBuilder databaseBuilder(
           String name, String password) =>
       _$FlutterDatabaseBuilder(name, password);
 
