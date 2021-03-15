@@ -6,20 +6,21 @@ import 'package:sqflite_sqlcipher/sqflite.dart';
 class Callback {
   /// Fired when the [database] has been just created with [version].
   final FutureOr<void> Function(
-    Database database,
-    int version,
-  ) onCreate;
+      Database database,
+      int version,
+      )? onCreate;
 
   /// Fired when the [database] has successfully been opened.
-  final FutureOr<void> Function(Database database) onOpen;
+  final FutureOr<void> Function(Database database)? onOpen;
 
   /// Fired when the [database] has finished upgrading from [startVersion] to [endVersion].
   final FutureOr<void> Function(
-    Database database,
-    int startVersion,
-    int endVersion,
-  ) onUpgrade;
+      Database database,
+      int startVersion,
+      int endVersion,
+      )? onUpgrade;
 
   /// Constructor.
   const Callback({this.onCreate, this.onOpen, this.onUpgrade});
 }
+
