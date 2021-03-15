@@ -6,7 +6,7 @@ import 'task.dart';
 @dao
 abstract class Task2Dao {
   @Query('SELECT * FROM task WHERE id = :id')
-  Future<Task> findTaskById(int id);
+  Future<Task?> findTaskById(int id);
 
   @Query('SELECT * FROM task')
   Future<List<Task>> findAllTasks();

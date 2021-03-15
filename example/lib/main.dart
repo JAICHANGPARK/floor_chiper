@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:floor_chiper/database.dart';
+import 'package:example/database.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -49,9 +49,9 @@ class TasksWidget extends StatefulWidget {
   final TaskDao dao;
 
   const TasksWidget({
-    Key key,
-    @required this.title,
-    @required this.dao,
+    Key? key,
+    required this.title,
+    required this.dao,
   }) : super(key: key);
 
   @override
@@ -119,8 +119,7 @@ class TasksListView extends StatelessWidget {
   final TaskDao dao;
 
   const TasksListView({
-    Key key,
-    @required this.dao,
+    Key? key, required this.dao,
   }) : super(key: key);
 
   @override
@@ -134,7 +133,7 @@ class TasksListView extends StatelessWidget {
           final tasks = snapshot.data;
 
           return ListView.builder(
-            itemCount: tasks.length,
+            itemCount: tasks!.length,
             itemBuilder: (_, index) {
               return TaskListCell(
                 task: tasks[index],
@@ -153,9 +152,9 @@ class TaskListCell extends StatelessWidget {
   final TaskDao dao;
 
   const TaskListCell({
-    Key key,
-    @required this.task,
-    @required this.dao,
+    Key? key,
+    required this.task,
+    required this.dao,
   }) : super(key: key);
 
   @override
@@ -188,8 +187,8 @@ class TasksTextField extends StatelessWidget {
   final TaskDao dao;
 
   TasksTextField({
-    Key key,
-    @required this.dao,
+    Key? key,
+    required this.dao,
   })  : _textEditingController = TextEditingController(),
         super(key: key);
 
