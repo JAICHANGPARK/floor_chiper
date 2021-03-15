@@ -46,11 +46,11 @@ class _$FlutterDatabaseBuilder {
   /// Creates the database and initializes it.
   Future<FlutterDatabase> build() async {
     final path = name != null
-        ? await sqfliteDatabaseFactory.getDatabasePath(name!)
+        ? await sqfliteDatabaseFactory?.getDatabasePath(name!)
         : ':memory:';
     final database = _$FlutterDatabase();
     database.database = await database.open(
-      path,
+      path!,
       password,
       _migrations,
       _callback,
@@ -68,7 +68,8 @@ class _$FlutterDatabase extends FlutterDatabase {
 
   Task2Dao? _task2DaoInstance;
 
-  Future<sqflite.Database> open(String path, List<Migration> migrations,
+  Future<sqflite.Database> open(
+      String path, String? password, List<Migration> migrations,
       [Callback? callback]) async {
     return sqflite.openDatabase(
       path,
