@@ -36,7 +36,7 @@ void main() {
          changeListener = listener ?? StreamController<String>.broadcast();
         }
       
-        Future<sqflite.Database> open(String path, List<Migration> migrations,
+        Future<sqflite.Database> open(String path, String password, List<Migration> migrations,
             [Callback? callback]) async {
           final databaseOptions = sqflite.OpenDatabaseOptions(
             version: 1,
