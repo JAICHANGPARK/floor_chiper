@@ -78,8 +78,8 @@ class DatabaseBuilderWriter extends Writer {
           : ':memory:';
         final database = _\$$_databaseName();
         database.database = await database.open(
-          path,
-          password,
+          path!,
+          password!,
           _migrations,
           _callback,
         );
