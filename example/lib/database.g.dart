@@ -9,20 +9,23 @@ part of 'database.dart';
 class $FloorFlutterDatabase {
   /// Creates a database builder for a persistent database.
   /// Once a database is built, you should keep a reference to it and re-use it.
-  static _$FlutterDatabaseBuilder databaseBuilder(String name) =>
-      _$FlutterDatabaseBuilder(name);
+  static _$FlutterDatabaseBuilder databaseBuilder(
+          String name, String password) =>
+      _$FlutterDatabaseBuilder(name, password);
 
   /// Creates a database builder for an in memory database.
   /// Information stored in an in memory database disappears when the process is killed.
   /// Once a database is built, you should keep a reference to it and re-use it.
   static _$FlutterDatabaseBuilder inMemoryDatabaseBuilder() =>
-      _$FlutterDatabaseBuilder(null);
+      _$FlutterDatabaseBuilder(null, password);
 }
 
 class _$FlutterDatabaseBuilder {
-  _$FlutterDatabaseBuilder(this.name);
+  _$FlutterDatabaseBuilder(this.name, this.password);
 
   final String? name;
+
+  final String password;
 
   final List<Migration> _migrations = [];
 
@@ -48,6 +51,7 @@ class _$FlutterDatabaseBuilder {
     final database = _$FlutterDatabase();
     database.database = await database.open(
       path,
+      password,
       _migrations,
       _callback,
     );
@@ -62,13 +66,15 @@ class _$FlutterDatabase extends FlutterDatabase {
 
   TaskDao? _taskDaoInstance;
 
-  Future<sqflite.Database> open(String path, List<Migration> migrations,
+  Future<sqflite.Database> open(
+      String path, String password, List<Migration> migrations,
       [Callback? callback]) async {
-    final databaseOptions = sqflite.OpenDatabaseOptions(
+    return sqflite.openDatabase(
+      path,
+      password: password,
       version: 1,
       onConfigure: (database) async {
         await database.execute('PRAGMA foreign_keys = ON');
-        await callback?.onConfigure?.call(database);
       },
       onOpen: (database) async {
         await callback?.onOpen?.call(database);
@@ -76,7 +82,6 @@ class _$FlutterDatabase extends FlutterDatabase {
       onUpgrade: (database, startVersion, endVersion) async {
         await MigrationAdapter.runMigrations(
             database, startVersion, endVersion, migrations);
-
         await callback?.onUpgrade?.call(database, startVersion, endVersion);
       },
       onCreate: (database, version) async {
@@ -86,7 +91,6 @@ class _$FlutterDatabase extends FlutterDatabase {
         await callback?.onCreate?.call(database, version);
       },
     );
-    return sqfliteDatabaseFactory.openDatabase(path, options: databaseOptions);
   }
 
   @override

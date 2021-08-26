@@ -10,19 +10,24 @@ class FloorWriter extends Writer {
   Class write() {
     final databaseBuilderName = '_\$${_databaseName}Builder';
 
-    final databaseBuilderMethod = Method((builder) => builder
-      ..name = 'databaseBuilder'
-      ..lambda = true
-      ..static = true
-      ..body = Code('$databaseBuilderName(name)')
-      ..returns = refer(databaseBuilderName)
-      ..docs.addAll([
-        r'/// Creates a database builder for a persistent database.',
-        '/// Once a database is built, you should keep a reference to it and re-use it.'
-      ])
-      ..requiredParameters.add(Parameter((builder) => builder
-        ..name = 'name'
-        ..type = refer('String'))));
+    final databaseBuilderMethod = Method(
+      (builder) => builder
+        ..name = 'databaseBuilder'
+        ..lambda = true
+        ..static = true
+        ..body = Code('$databaseBuilderName(name, password)')
+        ..returns = refer(databaseBuilderName)
+        ..docs.addAll([
+          r'/// Creates a database builder for a persistent database.',
+          '/// Once a database is built, you should keep a reference to it and re-use it.'
+        ])
+        ..requiredParameters.add(Parameter((builder) => builder
+          ..name = 'name'
+          ..type = refer('String')))
+        ..requiredParameters.add(Parameter((builder) => builder
+          ..name = 'password'
+          ..type = refer('String'))),
+    );
 
     final inMemoryDatabaseBuilderMethod = Method((builder) => builder
       ..name = 'inMemoryDatabaseBuilder'
@@ -34,7 +39,7 @@ class FloorWriter extends Writer {
         '/// Information stored in an in memory database disappears when the process is killed.',
         '/// Once a database is built, you should keep a reference to it and re-use it.'
       ])
-      ..body = Code('$databaseBuilderName(null)'));
+      ..body = Code('$databaseBuilderName(null, password)'));
 
     return Class((builder) => builder
       ..name = '\$Floor$_databaseName'

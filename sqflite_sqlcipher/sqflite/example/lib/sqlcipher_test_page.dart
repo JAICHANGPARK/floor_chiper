@@ -5,7 +5,7 @@ import 'package:path/path.dart';
 import 'package:sqflite_sqlcipher/sqflite.dart';
 import 'package:sqflite_sqlcipher_example/open_test_page.dart';
 
-import 'package:sqflite/sqflite.dart' as sqflite;
+import 'package:sqflite_sqlcipher/sqflite.dart' as sqflite;
 
 import 'test_page.dart';
 
