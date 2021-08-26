@@ -16,7 +16,7 @@ class $FloorFlutterDatabase {
   /// Creates a database builder for an in memory database.
   /// Information stored in an in memory database disappears when the process is killed.
   /// Once a database is built, you should keep a reference to it and re-use it.
-  static _$FlutterDatabaseBuilder inMemoryDatabaseBuilder() =>
+  static _$FlutterDatabaseBuilder inMemoryDatabaseBuilder(String password) =>
       _$FlutterDatabaseBuilder(null, password);
 }
 
@@ -87,7 +87,6 @@ class _$FlutterDatabase extends FlutterDatabase {
       onCreate: (database, version) async {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Task` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `message` TEXT NOT NULL)');
-
         await callback?.onCreate?.call(database, version);
       },
     );

@@ -34,6 +34,9 @@ class FloorWriter extends Writer {
       ..lambda = true
       ..static = true
       ..returns = refer(databaseBuilderName)
+      ..requiredParameters.add(Parameter((builder) => builder
+        ..name = 'password'
+        ..type = refer('String')))
       ..docs.addAll([
         r'/// Creates a database builder for an in memory database.',
         '/// Information stored in an in memory database disappears when the process is killed.',
