@@ -1,14 +1,21 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:example/database.dart';
 import 'package:example/task.dart';
 import 'package:example/task_dao.dart';
 import 'package:flutter/material.dart';
+import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:sqflite_sqlcipher/sqflite.dart' as sqflite;
+
+String kDbName = "flutter_database_ex.db";
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final database = await $FloorFlutterDatabase
-      .databaseBuilder('flutter_database.db', "super")
-      .build();
+  final database = await $FloorFlutterDatabase.databaseBuilder(kDbName, "super").build();
   final dao = database.taskDao;
 
   runApp(FloorApp(dao));
@@ -32,7 +39,7 @@ class FloorApp extends StatelessWidget {
   }
 }
 
-class TasksWidget extends StatelessWidget {
+class TasksWidget extends StatefulWidget {
   final String title;
   final TaskDao dao;
 
@@ -43,14 +50,62 @@ class TasksWidget extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<TasksWidget> createState() => _TasksWidgetState();
+}
+
+class _TasksWidgetState extends State<TasksWidget> {
+  Future getPermission() async {
+    if (await Permission.storage.request().isGranted) {
+      // Either the permission was already granted before or the user just granted it.
+    }
+
+// You can request multiple permissions at once.
+    Map<Permission, PermissionStatus> statuses = await [
+      Permission.location,
+      Permission.storage,
+    ].request();
+
+    print(statuses[Permission.storage]);
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    getPermission();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(title)),
+      appBar: AppBar(
+        title: Text(widget.title),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.close),
+            onPressed: () async {
+              String path = await sqflite.getDatabasesPath();
+              path = join(path, kDbName);
+              print(path);
+              File dbFile = File(path);
+              Uint8List dbData = await dbFile.readAsBytes();
+              final Directory s = (await getExternalStorageDirectory())!;
+              String outPath = s.path;
+              print(outPath);
+              outPath = join(s.path, kDbName);
+              print(outPath);
+              File file = File(outPath);
+              file = await file.writeAsBytes(dbData);
+            },
+          )
+        ],
+      ),
       body: SafeArea(
         child: Column(
           children: <Widget>[
-            TasksListView(dao: dao),
-            TasksTextField(dao: dao),
+            TasksListView(dao: widget.dao),
+            TasksTextField(dao: widget.dao),
           ],
         ),
       ),
@@ -134,7 +189,7 @@ class TasksTextField extends StatelessWidget {
   TasksTextField({
     Key? key,
     required this.dao,
-  })   : _textEditingController = TextEditingController(),
+  })  : _textEditingController = TextEditingController(),
         super(key: key);
 
   @override

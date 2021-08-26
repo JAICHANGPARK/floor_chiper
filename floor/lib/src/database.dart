@@ -22,4 +22,13 @@ abstract class FloorDatabase {
       await database.close();
     }
   }
+
+  Future<int> version() async {
+    final database = this.database;
+    if (database is sqflite.Database && database.isOpen) {
+      return database.getVersion();
+    } else {
+      return 0;
+    }
+  }
 }

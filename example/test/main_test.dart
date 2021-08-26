@@ -9,7 +9,7 @@ void main() {
   late TaskDao taskDao;
 
   setUp(() async {
-    database = await $FloorFlutterDatabase.inMemoryDatabaseBuilder().build();
+    database = await $FloorFlutterDatabase.inMemoryDatabaseBuilder("test").build();
     taskDao = database.taskDao;
   });
 
