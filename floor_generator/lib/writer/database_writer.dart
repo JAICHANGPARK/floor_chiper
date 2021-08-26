@@ -1,6 +1,6 @@
 import 'package:code_builder/code_builder.dart';
 import 'package:floor_generator/misc/annotation_expression.dart';
-import 'package:floor_generator/misc/annotations.dart';
+import 'package:floor_generator/misc/extension/string_extension.dart';
 import 'package:floor_generator/value_object/database.dart';
 import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/writer/writer.dart';
@@ -11,13 +11,11 @@ class DatabaseWriter implements Writer {
 
   DatabaseWriter(final this.database);
 
-  @nonNull
   @override
   Class write() {
     return _generateDatabaseImplementation(database);
   }
 
-  @nonNull
   Class _generateDatabaseImplementation(final Database database) {
     final databaseName = database.name;
 
@@ -30,14 +28,13 @@ class DatabaseWriter implements Writer {
       ..constructors.add(_generateConstructor()));
   }
 
-  @nonNull
   Constructor _generateConstructor() {
     return Constructor((builder) {
       final parameter = Parameter((builder) => builder
         ..name = 'listener'
-        ..type = refer('StreamController<String>'));
+        ..type = refer('StreamController<String>?'));
 
-      return builder
+      builder
         ..body = const Code(
           'changeListener = listener ?? StreamController<String>.broadcast();',
         )
@@ -45,7 +42,6 @@ class DatabaseWriter implements Writer {
     });
   }
 
-  @nonNull
   List<Method> _generateDaoGetters(final Database database) {
     return database.daoGetters.map((daoGetter) {
       final daoGetterName = daoGetter.name;
@@ -61,60 +57,54 @@ class DatabaseWriter implements Writer {
     }).toList();
   }
 
-  @nonNull
   List<Field> _generateDaoInstances(final Database database) {
     return database.daoGetters.map((daoGetter) {
       final daoGetterName = daoGetter.name;
       final daoTypeName = daoGetter.dao.classElement.displayName;
 
       return Field((builder) => builder
-        ..type = refer(daoTypeName)
+        ..type = refer('$daoTypeName?')
         ..name = '_${daoGetterName}Instance');
     }).toList();
   }
 
-  @nonNull
   Method _generateOpenMethod(final Database database) {
-    final createTableStatements =
-        _generateCreateTableSqlStatements(database.entities)
-            .map((statement) => "await database.execute('$statement');")
-            .join('\n');
+    final createTableStatements = _generateCreateTableSqlStatements(
+            database.entities)
+        .map((statement) => 'await database.execute(${statement.toLiteral()});')
+        .join('\n');
     final createIndexStatements = database.entities
         .map((entity) => entity.indices.map((index) => index.createQuery()))
         .expand((statements) => statements)
-        .map((statement) => "await database.execute('$statement');")
+        .map((statement) => 'await database.execute(${statement.toLiteral()});')
         .join('\n');
     final createViewStatements = database.views
-        .map((view) => view.getCreateViewStatement())
-        .map((statement) => "await database.execute('''$statement''');")
+        .map((view) => view.getCreateViewStatement().toLiteral())
+        .map((statement) => 'await database.execute($statement);')
         .join('\n');
 
     final pathParameter = Parameter((builder) => builder
       ..name = 'path'
       ..type = refer('String'));
-
-    final pwdParameter = Parameter((builder) => builder
-      ..name = 'password'
-      ..type = refer('String'));
-
     final migrationsParameter = Parameter((builder) => builder
       ..name = 'migrations'
       ..type = refer('List<Migration>'));
     final callbackParameter = Parameter((builder) => builder
       ..name = 'callback'
-      ..type = refer('Callback'));
+      ..type = refer('Callback?'));
 
     return Method((builder) => builder
       ..name = 'open'
       ..returns = refer('Future<sqflite.Database>')
       ..modifier = MethodModifier.async
-      ..requiredParameters.addAll([pathParameter, pwdParameter, migrationsParameter])
+      ..requiredParameters.addAll([pathParameter, migrationsParameter])
       ..optionalParameters.add(callbackParameter)
       ..body = Code('''
-            return sqflite.openDatabase(path, password: password, 
-           version: ${database.version},
+          final databaseOptions = sqflite.OpenDatabaseOptions(
+            version: ${database.version},
             onConfigure: (database) async {
               await database.execute('PRAGMA foreign_keys = ON');
+              await callback?.onConfigure?.call(database);
             },
             onOpen: (database) async {
               await callback?.onOpen?.call(database);
@@ -132,11 +122,10 @@ class DatabaseWriter implements Writer {
               await callback?.onCreate?.call(database, version);
             },
           );
-       
+          return sqfliteDatabaseFactory.openDatabase(path, options: databaseOptions);
           '''));
   }
 
-  @nonNull
   List<String> _generateCreateTableSqlStatements(final List<Entity> entities) {
     return entities.map((entity) => entity.getCreateTableStatement()).toList();
   }

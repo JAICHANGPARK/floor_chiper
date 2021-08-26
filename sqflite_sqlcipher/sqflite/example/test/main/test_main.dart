@@ -1,7 +1,7 @@
 import 'package:sqflite_sqlcipher_example/main.dart' as app;
 import 'package:sqflite_sqlcipher_example/main.dart';
 
-Future main() async {
+Future<void> main() async {
   // ignore_for_file: deprecated_member_use, deprecated_member_use_from_same_package
   // debugAutoStartRouteName = testExceptionRoute;
   // debugAutoStartRouteName = testOpenRoute;
@@ -10,5 +10,5 @@ Future main() async {
   // debugAutoStartRouteName = testTypeRoute;
   // debugAutoStartRouteName = testExpRoute;
 
-  await app.main();
+  app.main();
 }

@@ -24,7 +24,7 @@ flutter test --no-pub --coverage
       final dir = await Directory.systemTemp.createTemp('sqflite');
       final bashFilePath = join(dir.path, 'codecov.bash');
       await File(bashFilePath)
-          .writeAsString(await IOClient().read('https://codecov.io/bash'));
+          .writeAsString(await IOClient().read(Uri.https('https://codecov.io', '/bash')));
       await shell.run('bash $bashFilePath');
     } else {
       stdout.writeln(

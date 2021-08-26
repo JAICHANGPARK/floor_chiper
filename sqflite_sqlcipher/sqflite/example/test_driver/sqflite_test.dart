@@ -6,15 +6,6 @@ import 'package:test/test.dart';
 
 void main() {
   group('sqflite', () {
-    test('open null', () async {
-      var exception;
-      try {
-        await openDatabase(null);
-      } catch (e) {
-        exception = e;
-      }
-      expect(exception, isNotNull);
-    });
     test('exists', () async {
       expect(await databaseExists(inMemoryDatabasePath), isFalse);
       var path = 'test_exists.db';
@@ -24,7 +15,7 @@ void main() {
       try {
         expect(await databaseExists(path), isTrue);
       } finally {
-        await db?.close();
+        await db.close();
       }
     });
     test('close in transaction', () async {
@@ -49,14 +40,10 @@ void main() {
     ///
     /// An empty file is a valid empty sqlite file
     Future<bool> isDatabase(String path) async {
-      Database db;
+      Database? db;
       var isDatabase = false;
       try {
         db = await openReadOnlyDatabase(path);
-        var version = await db.getVersion();
-        if (version != null) {
-          isDatabase = true;
-        }
       } catch (_) {} finally {
         await db?.close();
       }
@@ -68,7 +55,7 @@ void main() {
       await deleteDatabase(path);
       try {
         var db = await openReadOnlyDatabase(path);
-        fail('should fail ${db?.path}');
+        fail('should fail ${db.path}');
       } on DatabaseException catch (_) {}
 
       expect(await isDatabase(path), isFalse);
@@ -117,7 +104,7 @@ void main() {
     test('multiple database', () async {
       //await Sqflite.devSetDebugModeOn(true);
       var count = 10;
-      var dbs = List<Database>(count);
+      var dbs = List<Database?>.filled(count, null);
       for (var i = 0; i < count; i++) {
         var path = 'test_multiple_$i.db';
         await deleteDatabase(path);
@@ -133,12 +120,12 @@ void main() {
       }
 
       for (var i = 0; i < count; i++) {
-        var db = dbs[i];
+        var db = dbs[i]!;
         try {
           var name = (await db.query('Test', columns: ['name']))
               .first
               .values
-              .first as String;
+              .first as String?;
           expect(name, 'test_$i');
         } finally {
           await db.close();
@@ -146,7 +133,7 @@ void main() {
       }
 
       for (var i = 0; i < count; i++) {
-        var db = dbs[i];
+        var db = dbs[i]!;
         await db.close();
       }
     });
@@ -206,7 +193,7 @@ void main() {
 
     test('deleteDatabase', () async {
       // await devVerbose();
-      Database db;
+      late Database db;
       try {
         var path = 'test_delete_database.db';
         await deleteDatabase(path);
@@ -230,7 +217,7 @@ void main() {
         db = await openDatabase(path);
         expect(await db.getVersion(), 0);
       } finally {
-        await db?.close();
+        await db.close();
       }
     });
   });

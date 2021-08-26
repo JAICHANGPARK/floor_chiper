@@ -6,11 +6,11 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SqfliteOperation.h"
+#import "SqfliteSqlCipherOperation.h"
 #import "SqfliteSqlCipherPlugin.h"
 
 // Abstract
-@implementation SqfliteOperation
+@implementation SqfliteSqlCipherOperation
 
 - (NSString*)getMethod {
     return  nil;
@@ -36,25 +36,25 @@
 
 @end
 
-@implementation SqfliteBatchOperation
+@implementation SqfliteSqlCipherBatchOperation
 
 @synthesize dictionary, results, error, noResult, continueOnError;
 
 - (NSString*)getMethod {
-    return [dictionary objectForKey:SqfliteParamMethod];
+    return [dictionary objectForKey:SqfliteSqlCipherParamMethod];
 }
 
 - (NSString*)getSql {
-    return [dictionary objectForKey:SqfliteParamSql];
+    return [dictionary objectForKey:SqfliteSqlCipherParamSql];
 }
 
 - (NSArray*)getSqlArguments {
-    NSArray* arguments = [dictionary objectForKey:SqfliteParamSqlArguments];
+    NSArray* arguments = [dictionary objectForKey:SqfliteSqlCipherParamSqlArguments];
     return [SqfliteSqlCipherPlugin toSqlArguments:arguments];
 }
 
 - (NSNumber*)getInTransactionArgument {
-    return [dictionary objectForKey:SqfliteParamInTransaction];
+    return [dictionary objectForKey:SqfliteSqlCipherParamInTransaction];
 }
 
 - (bool)getNoResult {
@@ -77,7 +77,7 @@
     if (![self getNoResult]) {
         // We wrap the result in 'result' map
         [results addObject:[NSDictionary dictionaryWithObject:((self.results == nil) ? [NSNull null] : self.results)
-                                                       forKey:SqfliteParamResult]];
+                                                       forKey:SqfliteSqlCipherParamResult]];
     }
 }
 
@@ -86,15 +86,15 @@
     if (![self getNoResult]) {
         // We wrap the error in an 'error' map
         NSMutableDictionary* error = [NSMutableDictionary new];
-        error[SqfliteParamErrorCode] = self.error.code;
+        error[SqfliteSqlCipherParamErrorCode] = self.error.code;
         if (self.error.message != nil) {
-            error[SqfliteParamErrorMessage] = self.error.message;
+            error[SqfliteSqlCipherParamErrorMessage] = self.error.message;
         }
         if (self.error.details != nil) {
-            error[SqfliteParamErrorData] = self.error.details;
+            error[SqfliteSqlCipherParamErrorData] = self.error.details;
         }
         [results addObject:[NSDictionary dictionaryWithObject:error
-                                                       forKey:SqfliteParamError]];
+                                                       forKey:SqfliteSqlCipherParamError]];
     }
 }
 
@@ -104,13 +104,13 @@
 
 @end
 
-@implementation SqfliteMethodCallOperation
+@implementation SqfliteSqlCipherMethodCallOperation
 
 @synthesize flutterMethodCall;
 @synthesize flutterResult;
 
-+ (SqfliteMethodCallOperation*)newWithCall:(FlutterMethodCall*)flutterMethodCall result:(FlutterResult)flutterResult {
-    SqfliteMethodCallOperation* operation = [SqfliteMethodCallOperation new];
++ (SqfliteSqlCipherMethodCallOperation*)newWithCall:(FlutterMethodCall*)flutterMethodCall result:(FlutterResult)flutterResult {
+    SqfliteSqlCipherMethodCallOperation* operation = [SqfliteSqlCipherMethodCallOperation new];
     operation.flutterMethodCall = flutterMethodCall;
     operation.flutterResult = flutterResult;
     return operation;
@@ -121,26 +121,26 @@
 }
 
 - (NSString*)getSql {
-    return flutterMethodCall.arguments[SqfliteParamSql];
+    return flutterMethodCall.arguments[SqfliteSqlCipherParamSql];
 }
 
 - (bool)getNoResult {
-    NSNumber* noResult = flutterMethodCall.arguments[SqfliteParamNoResult];
+    NSNumber* noResult = flutterMethodCall.arguments[SqfliteSqlCipherParamNoResult];
     return [noResult boolValue];
 }
 
 - (bool)getContinueOnError {
-    NSNumber* noResult = flutterMethodCall.arguments[SqfliteParamContinueOnError];
+    NSNumber* noResult = flutterMethodCall.arguments[SqfliteSqlCipherParamContinueOnError];
     return [noResult boolValue];
 }
 
 - (NSArray*)getSqlArguments {
-    NSArray* arguments = flutterMethodCall.arguments[SqfliteParamSqlArguments];
+    NSArray* arguments = flutterMethodCall.arguments[SqfliteSqlCipherParamSqlArguments];
     return [SqfliteSqlCipherPlugin toSqlArguments:arguments];
 }
 
 - (NSNumber*)getInTransactionArgument {
-    return flutterMethodCall.arguments[SqfliteParamInTransaction];
+    return flutterMethodCall.arguments[SqfliteSqlCipherParamInTransaction];
 }
 
 - (void)success:(NSObject*)results {

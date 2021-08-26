@@ -10,14 +10,14 @@
 
 @end
 
-extern NSString *const SqfliteParamMethod;
-extern NSString *const SqfliteParamSql;
-extern NSString *const SqfliteParamSqlArguments;
-extern NSString *const SqfliteParamInTransaction;
-extern NSString *const SqfliteParamNoResult;
-extern NSString *const SqfliteParamContinueOnError;
-extern NSString *const SqfliteParamResult;
-extern NSString *const SqfliteParamError;
-extern NSString *const SqfliteParamErrorCode;
-extern NSString *const SqfliteParamErrorMessage;
-extern NSString *const SqfliteParamErrorData;
+extern NSString *const SqfliteSqlCipherParamMethod;
+extern NSString *const SqfliteSqlCipherParamSql;
+extern NSString *const SqfliteSqlCipherParamSqlArguments;
+extern NSString *const SqfliteSqlCipherParamInTransaction;
+extern NSString *const SqfliteSqlCipherParamNoResult;
+extern NSString *const SqfliteSqlCipherParamContinueOnError;
+extern NSString *const SqfliteSqlCipherParamResult;
+extern NSString *const SqfliteSqlCipherParamError;
+extern NSString *const SqfliteSqlCipherParamErrorCode;
+extern NSString *const SqfliteSqlCipherParamErrorMessage;
+extern NSString *const SqfliteSqlCipherParamErrorData;

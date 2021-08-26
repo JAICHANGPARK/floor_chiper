@@ -6,10 +6,10 @@
 //
 #import "SqfliteSqlCipherPlugin.h"
 
-#ifndef SqfliteOperation_h
-#define SqfliteOperation_h
+#ifndef SqfliteSqlCipherOperation_h
+#define SqfliteSqlCipherOperation_h
 
-@interface SqfliteOperation : NSObject
+@interface SqfliteSqlCipherOperation : NSObject
 
 - (NSString*)getMethod;
 - (NSString*)getSql;
@@ -22,7 +22,7 @@
 
 @end
 
-@interface SqfliteBatchOperation : SqfliteOperation
+@interface SqfliteSqlCipherBatchOperation : SqfliteSqlCipherOperation
 
 @property (atomic, retain) NSDictionary* dictionary;
 @property (atomic, retain) NSObject* results;
@@ -36,13 +36,13 @@
 
 @end
 
-@interface SqfliteMethodCallOperation : SqfliteOperation
+@interface SqfliteSqlCipherMethodCallOperation : SqfliteSqlCipherOperation
 
 @property (atomic, retain) FlutterMethodCall* flutterMethodCall;
 @property (atomic, assign) FlutterResult flutterResult;
 
-+ (SqfliteMethodCallOperation*)newWithCall:(FlutterMethodCall*)flutterMethodCall result:(FlutterResult)flutterResult;
++ (SqfliteSqlCipherMethodCallOperation*)newWithCall:(FlutterMethodCall*)flutterMethodCall result:(FlutterResult)flutterResult;
 
 @end
 
-#endif /* SqfliteOperation_h */
+#endif /* SqfliteSqlCipherOperation_h */

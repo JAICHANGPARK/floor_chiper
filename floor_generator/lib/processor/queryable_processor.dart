@@ -1,9 +1,10 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:dartx/dartx.dart';
+import 'package:collection/collection.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
-import 'package:floor_generator/misc/annotations.dart';
+import 'package:floor_generator/misc/extension/dart_type_extension.dart';
 import 'package:floor_generator/misc/extension/set_extension.dart';
+import 'package:floor_generator/misc/extension/string_extension.dart';
 import 'package:floor_generator/misc/extension/type_converter_element_extension.dart';
 import 'package:floor_generator/misc/extension/type_converters_extension.dart';
 import 'package:floor_generator/misc/type_utils.dart';
@@ -28,13 +29,10 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
   QueryableProcessor(
     this.classElement,
     final Set<TypeConverter> typeConverters,
-  )   : assert(classElement != null),
-        assert(typeConverters != null),
-        _queryableProcessorError = QueryableProcessorError(classElement),
+  )   : _queryableProcessorError = QueryableProcessorError(classElement),
         queryableTypeConverters = typeConverters +
             classElement.getTypeConverters(TypeConverterScope.queryable);
 
-  @nonNull
   @protected
   List<Field> getFields() {
     if (classElement.mixins.isNotEmpty) {
@@ -54,7 +52,6 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
     }).toList();
   }
 
-  @nonNull
   @protected
   String getConstructor(final List<Field> fields) {
     final constructorParameters = classElement.constructors.first.parameters;
@@ -67,16 +64,14 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
   }
 
   /// Returns `null` whenever field is @ignored
-  @nullable
-  String _getParameterValue(
+  String? _getParameterValue(
     final ParameterElement parameterElement,
     final List<Field> fields,
   ) {
     final parameterName = parameterElement.displayName;
-    final field = fields.firstWhere(
-      (field) => field.name == parameterName,
-      orElse: () => null, // whenever field is @ignored
-    );
+    final field =
+        // null whenever field is @ignored
+        fields.firstWhereOrNull((field) => field.name == parameterName);
     if (field != null) {
       final databaseValue = "row['${field.columnName}']";
 
@@ -85,16 +80,14 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
       if (parameterElement.type.isDefaultSqlType) {
         parameterValue = databaseValue.cast(
           parameterElement.type,
-          field.isNullable,
           parameterElement,
         );
       } else {
         final typeConverter = [...queryableTypeConverters, field.typeConverter]
-            .filterNotNull()
+            .whereNotNull()
             .getClosest(parameterElement.type);
         final castedDatabaseValue = databaseValue.cast(
           typeConverter.databaseType,
-          field.isNullable,
           parameterElement,
         );
 
@@ -113,27 +106,21 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
 }
 
 extension on String {
-  String cast(
-    DartType dartType,
-    bool isNullable,
-    ParameterElement parameterElement,
-  ) {
+  String cast(DartType dartType, ParameterElement parameterElement) {
     if (dartType.isDartCoreBool) {
-      if (isNullable) {
+      if (dartType.isNullable) {
         // if the value is null, return null
         // if the value is not null, interpret 1 as true and 0 as false
         return '$this == null ? null : ($this as int) != 0';
       } else {
         return '($this as int) != 0';
       }
-    } else if (dartType.isDartCoreString) {
-      return '$this as String';
-    } else if (dartType.isDartCoreInt) {
-      return '$this as int';
-    } else if (dartType.isUint8List) {
-      return '$this as Uint8List';
-    } else if (dartType.isDartCoreDouble) {
-      return '$this as double'; // must be double
+    } else if (dartType.isDartCoreString ||
+        dartType.isDartCoreInt ||
+        dartType.isUint8List ||
+        dartType.isDartCoreDouble) {
+      final typeString = dartType.getDisplayString(withNullability: true);
+      return '$this as $typeString';
     } else {
       throw InvalidGenerationSourceError(
         'Trying to convert unsupported type $dartType.',

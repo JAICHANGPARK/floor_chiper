@@ -1,26 +1,21 @@
 import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/value_object/field.dart';
-import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
-import '../mocks.dart';
+import '../fakes.dart';
 
 void main() {
-  final mockFieldElement = MockFieldElement();
-
-  tearDown(() {
-    clearInteractions(mockFieldElement);
-    reset(mockFieldElement);
-  });
+  final fakeFieldElement = FakeFieldElement();
 
   test('Get database definition with auto generate primary key', () {
     const autoGenerate = true;
     final field = Field(
-      mockFieldElement,
+      fakeFieldElement,
       'field1Name',
       'field1ColumnName',
       false,
       SqlType.integer,
+      null,
     );
 
     final actual = field.getDatabaseDefinition(autoGenerate);
@@ -33,11 +28,12 @@ void main() {
   test('Get database definition', () {
     const autoGenerate = false;
     final field = Field(
-      mockFieldElement,
+      fakeFieldElement,
       'field1Name',
       'field1ColumnName',
       true,
       SqlType.text,
+      null,
     );
 
     final actual = field.getDatabaseDefinition(autoGenerate);

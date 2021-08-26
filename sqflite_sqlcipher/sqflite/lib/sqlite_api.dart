@@ -62,13 +62,13 @@ abstract class SqlCipherOpenDatabaseOptions extends OpenDatabaseOptions {
   /// Specify [password] for encrypted database
   ///
   factory SqlCipherOpenDatabaseOptions(
-      {int version,
-      OnDatabaseConfigureFn onConfigure,
-      OnDatabaseCreateFn onCreate,
-      OnDatabaseVersionChangeFn onUpgrade,
-      OnDatabaseVersionChangeFn onDowngrade,
-      OnDatabaseOpenFn onOpen,
-      String password,
+      {int? version,
+      OnDatabaseConfigureFn? onConfigure,
+      OnDatabaseCreateFn? onCreate,
+      OnDatabaseVersionChangeFn? onUpgrade,
+      OnDatabaseVersionChangeFn? onDowngrade,
+      OnDatabaseOpenFn? onOpen,
+      String? password,
       bool readOnly = false,
       bool singleInstance = true}) {
     return impl.SqfliteSqlCipherOpenDatabaseOptions(
@@ -84,5 +84,5 @@ abstract class SqlCipherOpenDatabaseOptions extends OpenDatabaseOptions {
   }
 
   /// Password for encrypted database.
-  String password;
+  String? password;
 }

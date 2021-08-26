@@ -10,6 +10,7 @@ import net.sqlcipher.database.SQLiteDatabase;
 import android.database.sqlite.SQLiteCantOpenDatabaseException;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.Looper;
 import android.os.Process;
 import android.util.Log;
 
@@ -103,7 +104,8 @@ public class SqfliteSqlCipherPlugin implements FlutterPlugin, MethodCallHandler 
     //
     // Plugin registration.
     //
-    public static void registerWith(Registrar registrar) {
+    @SuppressWarnings("deprecation")
+    public static void registerWith(io.flutter.plugin.common.PluginRegistry.Registrar registrar) {
         SqfliteSqlCipherPlugin sqflitePlugin = new SqfliteSqlCipherPlugin();
         sqflitePlugin.onAttachedToEngine(registrar.context(), registrar.messenger());
     }
@@ -1052,7 +1054,7 @@ public class SqfliteSqlCipherPlugin implements FlutterPlugin, MethodCallHandler 
 
     private class BgResult implements Result {
         // Caller handler
-        final Handler handler = new Handler();
+        final Handler handler = new Handler(Looper.getMainLooper());
         private final Result result;
 
         private BgResult(Result result) {

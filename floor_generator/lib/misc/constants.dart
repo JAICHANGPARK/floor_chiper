@@ -8,7 +8,6 @@ abstract class AnnotationField {
   static const databaseViews = 'views';
 
   static const columnInfoName = 'name';
-  static const columnInfoNullable = 'nullable';
 
   static const entityTableName = 'tableName';
   static const entityForeignKeys = 'foreignKeys';
@@ -28,6 +27,16 @@ abstract class ForeignKeyField {
   static const parentColumns = 'parentColumns';
   static const onUpdate = 'onUpdate';
   static const onDelete = 'onDelete';
+}
+
+abstract class Fts3Field {
+  static const tokenizer = 'tokenizer';
+  static const tokenizerArgs = 'tokenizerArgs';
+}
+
+abstract class Fts4Field {
+  static const tokenizer = 'tokenizer';
+  static const tokenizerArgs = 'tokenizerArgs';
 }
 
 abstract class IndexField {

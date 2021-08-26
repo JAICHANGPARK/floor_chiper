@@ -5,7 +5,7 @@ import 'package:sqflite_sqlcipher/sqflite.dart';
 const channel = MethodChannel('com.davidmartos96.sqflite_sqlcipher');
 
 class MockMethodCall {
-  String expectedMethod;
+  String? expectedMethod;
   dynamic expectedArguments;
   dynamic response;
 
@@ -23,7 +23,7 @@ class MockScenario {
         .toList(growable: false);
   }
 
-  List<MockMethodCall> methodsCalls;
+  late List<MockMethodCall> methodsCalls;
   var index = 0;
   dynamic exception;
 
@@ -84,6 +84,11 @@ void main() {
           1
         ],
         [
+          'query',
+          {'sql': 'PRAGMA user_version', 'arguments': null, 'id': 1},
+          {}
+        ],
+        [
           'execute',
           {
             'sql': 'BEGIN EXCLUSIVE',
@@ -96,7 +101,7 @@ void main() {
         [
           'query',
           {'sql': 'PRAGMA user_version', 'arguments': null, 'id': 1},
-          null
+          {}
         ],
         [
           'execute',

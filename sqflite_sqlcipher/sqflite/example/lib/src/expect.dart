@@ -8,7 +8,7 @@ import 'package:matcher/matcher.dart';
 import 'package:meta/meta.dart';
 
 /// An exception thrown when a test assertion fails.
-class TestFailure {
+class TestFailure extends Error {
   /// An exception thrown when a test assertion fails.
   TestFailure(this.message);
 
@@ -23,7 +23,7 @@ class TestFailure {
 /// upon failures in [expect].
 @Deprecated('Will be removed in 0.13.0.')
 typedef ErrorFormatter = String Function(dynamic actual, Matcher matcher,
-    String reason, Map matchState, bool verbose);
+    String? reason, Map matchState, bool verbose);
 
 /// Assert that [actual] matches [matcher].
 ///
@@ -52,7 +52,7 @@ typedef ErrorFormatter = String Function(dynamic actual, Matcher matcher,
 void expect(
   actual,
   matcher, {
-  String reason,
+  String? reason,
   skip,
 }) {
   _expect(actual, matcher, reason: reason, skip: skip);
@@ -69,10 +69,10 @@ void expect(
 ///
 /// If the matcher fails asynchronously, that failure is piped to the returned
 /// future where it can be handled by user code.
-Future expectLater(actual, matcher, {String reason, skip}) =>
+Future expectLater(actual, matcher, {String? reason, skip}) =>
     _expect(actual, matcher, reason: reason, skip: skip);
 
-String _formatFailure(Matcher expected, actual, String which, {String reason}) {
+String _formatFailure(Matcher expected, actual, String which, {String? reason}) {
   var buffer = StringBuffer();
   buffer.writeln(indent(prettyPrint(expected), first: 'Expected: '));
   buffer.writeln(indent(prettyPrint(actual), first: '  Actual: '));
@@ -82,12 +82,12 @@ String _formatFailure(Matcher expected, actual, String which, {String reason}) {
 }
 
 /// The implementation of [expect] and [expectLater].
-Future _expect(actual, matcher,
-    {String reason,
+Future<void> _expect(actual, matcher,
+    {String? reason,
     skip,
     bool verbose = false,
     // ignore: deprecated_member_use, deprecated_member_use_from_same_package
-    ErrorFormatter formatter}) {
+    ErrorFormatter? formatter}) async {
   formatter ??= (actual, matcher, reason, matchState, verbose) {
     var mismatchDescription = StringDescription();
     matcher.describeMismatch(actual, mismatchDescription, matchState, verbose);
@@ -111,16 +111,19 @@ Future _expect(actual, matcher,
   } catch (e, trace) {
     reason ??= '$e at $trace';
   }
-  fail(formatter(actual, matcher as Matcher, reason, matchState, verbose));
+
+  final errorStr = formatter(actual, matcher as Matcher, reason, matchState, verbose);
+  print("Error str: $errorStr");
+  fail(errorStr);
 }
 
 /// Convenience method for throwing a new [TestFailure] with the provided
 /// [message].
 @alwaysThrows
-void fail([String message]) => throw TestFailure(message ?? 'should fail');
+Never fail([String? message]) => throw TestFailure(message ?? 'should fail');
 
 /// index text helper.
-String indent(String text, {String first}) {
+String indent(String text, {String? first}) {
   if (first != null) {
     return '$first $text';
   }
@@ -128,7 +131,7 @@ String indent(String text, {String first}) {
 }
 
 /// index text helper.
-String prettyPrint(dynamic text, {String first}) {
+String prettyPrint(dynamic text, {String? first}) {
   if (first != null) {
     return '$first $text';
   }
@@ -137,7 +140,7 @@ String prettyPrint(dynamic text, {String first}) {
 
 /// The default error formatter.
 @Deprecated('Will be removed in 0.13.0.')
-String formatFailure(Matcher expected, actual, String which, {String reason}) {
+String formatFailure(Matcher expected, actual, String which, {String? reason}) {
   var buffer = StringBuffer();
   buffer.writeln(indent(prettyPrint(expected), first: 'Expected: '));
   buffer.writeln(indent(prettyPrint(actual), first: '  Actual: '));

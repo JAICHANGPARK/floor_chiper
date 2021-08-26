@@ -14,7 +14,7 @@ flutter test
 
 ''');
 
-  var exception;
+  Object? exception;
   try {
     await driver.main();
   } catch (e) {

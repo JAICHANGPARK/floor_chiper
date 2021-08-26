@@ -11,7 +11,7 @@ import 'sqflite_sql_cipher_impl.dart';
 /// Platform error constant
 const String sqliteErrorCode = "sqlite_error";
 
-DatabaseFactory _databaseFactory;
+DatabaseFactory? _databaseFactory;
 
 /// Default factory
 DatabaseFactory get databaseFactory => sqlfliteSqlCipherDatabaseFactory;

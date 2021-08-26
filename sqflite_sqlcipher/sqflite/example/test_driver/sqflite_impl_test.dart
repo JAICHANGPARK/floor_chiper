@@ -10,21 +10,6 @@ void main() {
   group('impl', () {
     if (Platform.isIOS || Platform.isAndroid) {
       group('debug_info', () {
-        test('open null', () async {
-          var info = await factory.getDebugInfo();
-          expect(info.databases, isNull);
-          expect(info.logLevel, isNull);
-          var exception;
-          try {
-            await factory.openDatabase(null);
-          } catch (e) {
-            exception = e;
-          }
-          expect(exception, isNotNull);
-
-          info = await factory.getDebugInfo();
-          expect(info.databases, isNull);
-        });
 
         // test('verbose')
 
@@ -42,8 +27,8 @@ void main() {
           print('Sqflite opening database: ${sw.elapsed}');
           try {
             info = await factory.getDebugInfo();
-            expect(info.databases.length, 1);
-            var dbInfo = info.databases.values.first;
+            expect(info.databases!.length, 1);
+            var dbInfo = info.databases!.values.first;
             expect(dbInfo.singleInstance, isTrue);
             expect(dbInfo.path, join(await factory.getDatabasesPath(), path));
             // expect(dbInfo.logLevel, isNull);
@@ -56,7 +41,7 @@ void main() {
             expect(db, previousDb);
           } finally {
             sw = Stopwatch()..start();
-            await db?.close();
+            await db.close();
             print('Sqflite closing database: ${sw.elapsed}');
           }
 
@@ -64,7 +49,7 @@ void main() {
           expect(info.databases, isNull);
 
           // reopen
-          var id = db.id;
+          var id = db.id!;
           sw = Stopwatch()..start();
           var db3 = await openDatabase(path) as impl.SqfliteDatabaseMixin;
           print('Sqflite opening database: ${sw.elapsed}');
@@ -72,7 +57,7 @@ void main() {
             expect(db3.id, id + 1);
           } finally {
             sw = Stopwatch()..start();
-            await db3?.close();
+            await db3.close();
             print('Sqflite closing database: ${sw.elapsed}');
 
             // close again

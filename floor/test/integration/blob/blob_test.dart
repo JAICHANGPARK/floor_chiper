@@ -5,14 +5,14 @@ import 'package:collection/collection.dart';
 import 'package:floor/floor.dart';
 import 'package:floor_annotation/floor_annotation.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sqflite_sqlcipher/sqflite.dart' as sqflite;
+import 'package:sqflite/sqflite.dart' as sqflite;
 
 part 'blob_test.g.dart';
 
 void main() {
   group('BLOB tests', () {
-    TestDatabase database;
-    PersonDao personDao;
+    late TestDatabase database;
+    late PersonDao personDao;
 
     setUp(() async {
       database = await $FloorTestDatabase.inMemoryDatabaseBuilder().build();
@@ -71,7 +71,7 @@ abstract class TestDatabase extends FloorDatabase {
 @dao
 abstract class PersonDao {
   @Query('SELECT * FROM Person WHERE picture = :picture')
-  Future<Person> findPersonByPicture(Uint8List picture);
+  Future<Person?> findPersonByPicture(Uint8List picture);
 
   @insert
   Future<void> insertPerson(Person person);

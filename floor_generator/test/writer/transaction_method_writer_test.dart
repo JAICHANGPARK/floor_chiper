@@ -48,13 +48,13 @@ void main() {
       @override
       Future<int> replacePersons(List<Person> persons) async {
         if (database is sqflite.Transaction) {
-          return await super.replacePersons(persons);
+          return super.replacePersons(persons);
         } else {
-          return await (database as sqflite.Database)
+          return (database as sqflite.Database)
               .transaction<int>((transaction) async {
             final transactionDatabase = _$TestDatabase(changeListener)
               ..database = transaction;
-            return await transactionDatabase.personDao.replacePersons(persons);
+            return transactionDatabase.personDao.replacePersons(persons);
           });
         }
       }
@@ -75,13 +75,95 @@ void main() {
       @override
       Future<Person> replacePersons(List<Person> persons) async {
         if (database is sqflite.Transaction) {
-          return await super.replacePersons(persons);
+          return super.replacePersons(persons);
         } else {
-          return await (database as sqflite.Database)
+          return (database as sqflite.Database)
               .transaction<Person>((transaction) async {
             final transactionDatabase = _$TestDatabase(changeListener)
               ..database = transaction;
-            return await transactionDatabase.personDao.replacePersons(persons);
+            return transactionDatabase.personDao.replacePersons(persons);
+          });
+        }
+      }
+    '''));
+  });
+
+  test('Generate transaction method with nullable future return', () async {
+    final transactionMethod = await _createTransactionMethod('''
+      @transaction
+      Future<Person>? replacePersons(List<Person> persons) async {
+        return null;
+      }
+    ''');
+
+    final actual = TransactionMethodWriter(transactionMethod).write();
+
+    expect(actual, equalsDart(r'''
+      @override
+      Future<Person>? replacePersons(List<Person> persons) async {
+        if (database is sqflite.Transaction) {
+          return super.replacePersons(persons);
+        } else {
+          return (database as sqflite.Database)
+              .transaction<Person>((transaction) async {
+            final transactionDatabase = _$TestDatabase(changeListener)
+              ..database = transaction;
+            return transactionDatabase.personDao.replacePersons(persons);
+          });
+        }
+      }
+    '''));
+  });
+
+  test('Generate transaction method with nullable return type parameter',
+      () async {
+    final transactionMethod = await _createTransactionMethod('''
+      @transaction
+      Future<Person?> replacePersons(List<Person> persons) async {
+        return null;
+      }
+    ''');
+
+    final actual = TransactionMethodWriter(transactionMethod).write();
+
+    expect(actual, equalsDart(r'''
+      @override
+      Future<Person?> replacePersons(List<Person> persons) async {
+        if (database is sqflite.Transaction) {
+          return super.replacePersons(persons);
+        } else {
+          return (database as sqflite.Database)
+              .transaction<Person>((transaction) async {
+            final transactionDatabase = _$TestDatabase(changeListener)
+              ..database = transaction;
+            return transactionDatabase.personDao.replacePersons(persons);
+          });
+        }
+      }
+    '''));
+  });
+
+  test('Generate transaction method with nullable parameter', () async {
+    final transactionMethod = await _createTransactionMethod('''
+      @transaction
+      Future<Person>? replacePersons(Person? person) async {
+        return null;
+      }
+    ''');
+
+    final actual = TransactionMethodWriter(transactionMethod).write();
+
+    expect(actual, equalsDart(r'''
+      @override
+      Future<Person>? replacePersons(Person? person) async {
+        if (database is sqflite.Transaction) {
+          return super.replacePersons(person);
+        } else {
+          return (database as sqflite.Database)
+              .transaction<Person>((transaction) async {
+            final transactionDatabase = _$TestDatabase(changeListener)
+              ..database = transaction;
+            return transactionDatabase.personDao.replacePersons(person);
           });
         }
       }

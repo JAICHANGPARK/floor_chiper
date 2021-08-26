@@ -15,7 +15,7 @@ class ManualTestPage extends StatefulWidget {
 }
 
 class _ManualTestPageState extends State<ManualTestPage> {
-  Database database;
+  Database? database;
   static const String dbName = 'manual_test.db';
 
   Future<Database> _openDatabase() async {
@@ -32,13 +32,13 @@ class _ManualTestPageState extends State<ManualTestPage> {
   }
 
   Future _incrementVersion() async {
-    var version = await database.getVersion();
+    var version = await database!.getVersion();
     print('version $version');
-    await database.setVersion(version + 1);
+    await database!.setVersion(version + 1);
   }
 
-  List<MenuItem> items;
-  List<ItemWidget> itemWidgets;
+  late List<MenuItem> items;
+  late List<ItemWidget> itemWidgets;
 
   Future<bool> pop() async {
     return true;
@@ -70,7 +70,7 @@ class _ManualTestPageState extends State<ManualTestPage> {
       MenuItem('Get info', () async {
         final factory = databaseFactory as impl.SqfliteDatabaseFactoryMixin;
         var info = await factory.getDebugInfo();
-        print(info?.toString());
+        print(info.toString());
       }, summary: 'Implementation info (dev only)'),
       MenuItem('Increment version', () async {
         print(await _incrementVersion());
@@ -151,21 +151,21 @@ class MultipleDbTestPage extends StatelessWidget {
 /// Simple db test page.
 class SimpleDbTestPage extends StatefulWidget {
   /// Simple db test page.
-  const SimpleDbTestPage({Key key, this.dbName}) : super(key: key);
+  const SimpleDbTestPage({Key? key, this.dbName}) : super(key: key);
 
   /// db name.
-  final String dbName;
+  final String? dbName;
 
   @override
   _SimpleDbTestPageState createState() => _SimpleDbTestPageState();
 }
 
 class _SimpleDbTestPageState extends State<SimpleDbTestPage> {
-  Database database;
+  Database? database;
 
   Future<Database> _openDatabase() async {
     // await Sqflite.devSetOptions(SqfliteOptions(logLevel: sqfliteLogLevelVerbose));
-    return database ??= await databaseFactory.openDatabase(widget.dbName,
+    return database ??= await databaseFactory.openDatabase(widget.dbName!,
         options: OpenDatabaseOptions(
             version: 1,
             onCreate: (db, version) async {
@@ -192,7 +192,7 @@ class _SimpleDbTestPageState extends State<SimpleDbTestPage> {
         body: Builder(
           builder: (context) {
             Widget menuItem(String title, void Function() onTap,
-                {String summary}) {
+                {String? summary}) {
               return ListTile(
                 title: Text(title),
                 subtitle: summary == null ? null : Text(summary),
@@ -202,9 +202,9 @@ class _SimpleDbTestPageState extends State<SimpleDbTestPage> {
 
             Future _countRecord() async {
               var db = await _openDatabase();
-              var result = await firstIntValue(
+              var result = firstIntValue(
                   await db.query('test', columns: ['COUNT(*)']));
-              Scaffold.of(context).showSnackBar(SnackBar(
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text('$result records'),
                 duration: Duration(milliseconds: 700),
               ));

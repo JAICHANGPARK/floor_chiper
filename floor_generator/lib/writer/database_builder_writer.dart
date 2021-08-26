@@ -1,25 +1,19 @@
 import 'package:code_builder/code_builder.dart';
-import 'package:floor_generator/misc/annotations.dart';
 import 'package:floor_generator/writer/writer.dart';
 
 class DatabaseBuilderWriter extends Writer {
   final String _databaseName;
 
-  DatabaseBuilderWriter(final String databaseName) : _databaseName = databaseName;
+  DatabaseBuilderWriter(final String databaseName)
+      : _databaseName = databaseName;
 
-  @nonNull
   @override
   Class write() {
     final databaseBuilderName = '_\$${_databaseName}Builder';
 
-    final passwordField = Field((builder) => builder
-      ..name = 'password'
-      ..type = refer('String')
-      ..modifier = FieldModifier.final$);
-
     final nameField = Field((builder) => builder
       ..name = 'name'
-      ..type = refer('String')
+      ..type = refer('String?')
       ..modifier = FieldModifier.final$);
 
     final migrationsField = Field((builder) => builder
@@ -30,19 +24,12 @@ class DatabaseBuilderWriter extends Writer {
 
     final callbackField = Field((builder) => builder
       ..name = '_callback'
-      ..type = refer('Callback'));
+      ..type = refer('Callback?'));
 
     final constructor = Constructor((builder) => builder
-      ..requiredParameters.add(
-        Parameter((builder) => builder
-          ..toThis = true
-          ..name = 'name'),
-      )
-      ..requiredParameters.add(
-        Parameter((builder) => builder
-          ..toThis = true
-          ..name = 'password'),
-      ));
+      ..requiredParameters.add(Parameter((builder) => builder
+        ..toThis = true
+        ..name = 'name')));
 
     final addMigrationsMethod = Method((builder) => builder
       ..name = 'addMigrations'
@@ -74,17 +61,12 @@ class DatabaseBuilderWriter extends Writer {
       ..modifier = MethodModifier.async
       ..docs.add('/// Creates the database and initializes it.')
       ..body = Code('''
-        String path;
-        if (name != null) {
-        path = await sqflite.getDatabasesPath();
-        path = join(path, name);
-        } else {
-        path = ':memory:';
-        }
+        final path = name != null
+          ? await sqfliteDatabaseFactory.getDatabasePath(name!)
+          : ':memory:';
         final database = _\$$_databaseName();
         database.database = await database.open(
           path,
-          password,
           _migrations,
           _callback,
         );
@@ -95,7 +77,6 @@ class DatabaseBuilderWriter extends Writer {
       ..name = databaseBuilderName
       ..fields.addAll([
         nameField,
-        passwordField,
         migrationsField,
         callbackField,
       ])

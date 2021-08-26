@@ -32,7 +32,7 @@ class MyApp extends StatefulWidget {
 }
 
 /// SqlCipher test page
-const String testSqlCipherRoute = "/test/sqlcipher";
+const String testSqlCipherRoute = '/test/sqlcipher';
 
 /// Simple test page.
 const String testRawRoute = '/test/simple';
@@ -104,13 +104,13 @@ class _MyAppState extends State<MyApp> {
 /// App home menu page.
 class MyHomePage extends StatefulWidget {
   /// App home menu page.
-  MyHomePage({Key key, this.title}) : super(key: key) {
+  MyHomePage({Key? key, this.title}) : super(key: key) {
     _items.add(MainItem(
-        "Sqlcipher tests", "Simple tests with an encrypted database",
+        'Sqlcipher tests', 'Simple tests with an encrypted database',
         route: testSqlCipherRoute));
     _items.add(
-        MainItem("Raw tests", "Raw SQLite operations", route: testRawRoute));
-    _items.add(MainItem("Open tests", "Open onCreate/onUpgrade/onDowngrade",
+        MainItem('Raw tests', 'Raw SQLite operations', route: testRawRoute));
+    _items.add(MainItem('Open tests', 'Open onCreate/onUpgrade/onDowngrade',
         route: testOpenRoute));
     _items
         .add(MainItem('Type tests', 'Test value types', route: testTypeRoute));
@@ -138,24 +138,24 @@ class MyHomePage extends StatefulWidget {
   final List<MainItem> _items = [];
 
   /// Page title.
-  final String title;
+  final String? title;
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-String _debugAutoStartRouteName;
+String? _debugAutoStartRouteName;
 
 /// (debug) set the route to start with.
-String get debugAutoStartRouteName => _debugAutoStartRouteName;
+String? get debugAutoStartRouteName => _debugAutoStartRouteName;
 
 /// Deprecated to avoid calls
 @deprecated
-set debugAutoStartRouteName(String routeName) =>
+set debugAutoStartRouteName(String? routeName) =>
     _debugAutoStartRouteName = routeName;
 
 class _MyHomePageState extends State<MyHomePage> {
-  String _platformVersion = 'Unknown';
+  String? _platformVersion = 'Unknown';
 
   int get _itemCount => widget._items.length;
 
@@ -167,7 +167,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future initPlatformState() async {
-    String platformVersion;
+    String? platformVersion;
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
       // ignore: deprecated_member_use
@@ -185,7 +185,7 @@ class _MyHomePageState extends State<MyHomePage> {
       _platformVersion = platformVersion;
     });
 
-    print('running on: ' + _platformVersion);
+    print('running on: ' + _platformVersion!);
 
     // Use it to auto start a test page
     if (debugAutoStartRouteName != null) {
@@ -193,7 +193,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
       // await Navigator.of(context).pushNamed(testExpRoute);
       // await Navigator.of(context).pushNamed(testRawRoute);
-      var future = Navigator.of(context).pushNamed(debugAutoStartRouteName);
+      var future = Navigator.of(context).pushNamed(debugAutoStartRouteName!);
       // ignore: deprecated_member_use_from_same_package
       debugAutoStartRouteName = null;
       await future;
@@ -263,7 +263,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _itemBuilder(BuildContext context, int index) {
     return MainItemWidget(widget._items[index], (MainItem item) {
-      Navigator.of(context).pushNamed(item.route);
+      Navigator.of(context).pushNamed(item.route!);
     });
   }
 }

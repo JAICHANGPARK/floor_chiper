@@ -10,5 +10,5 @@ const String channelName = 'com.davidmartos96.sqflite_sqlcipher';
 const MethodChannel channel = MethodChannel(channelName);
 
 /// Invoke a native method
-Future<T> invokeMethod<T>(String method, [dynamic arguments]) =>
+Future<T?> invokeMethod<T>(String method, [dynamic arguments]) =>
     channel.invokeMethod<T>(method, arguments);

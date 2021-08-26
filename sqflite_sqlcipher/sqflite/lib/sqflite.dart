@@ -21,7 +21,7 @@ class Sqflite {
 
   /// deprecated
   @deprecated
-  static Future<String> get platformVersion =>
+  static Future<String?> get platformVersion =>
       invokeMethod<String>(methodGetPlatformVersion);
 
   /// Turns on debug mode if you want to see the SQL query
@@ -55,7 +55,7 @@ class Sqflite {
 
   /// helper to get the first int value in a query
   /// Useful for COUNT(*) queries
-  static int firstIntValue(List<Map<String, dynamic>> list) =>
+  static int? firstIntValue(List<Map<String, dynamic>> list) =>
       utils.firstIntValue(list);
 
   /// Utility to encode a blob to allow blow query using
@@ -65,7 +65,7 @@ class Sqflite {
   /// Sqlite has a dead lock warning feature that will print some text
   /// after 10s, you can override the default behavior
   static void setLockWarningInfo(
-      {Duration duration, void Function() callback}) {
+      {Duration? duration, void Function()? callback}) {
     utils.setLockWarningInfo(duration: duration, callback: callback);
   }
 }
@@ -123,13 +123,13 @@ class Sqflite {
 /// parameters such as callbacks for that invocation.
 ///
 Future<Database> openDatabase(String path,
-    {int version,
-    OnDatabaseConfigureFn onConfigure,
-    OnDatabaseCreateFn onCreate,
-    OnDatabaseVersionChangeFn onUpgrade,
-    OnDatabaseVersionChangeFn onDowngrade,
-    OnDatabaseOpenFn onOpen,
-    String password,
+    {int? version,
+    OnDatabaseConfigureFn? onConfigure,
+    OnDatabaseCreateFn? onCreate,
+    OnDatabaseVersionChangeFn? onUpgrade,
+    OnDatabaseVersionChangeFn? onDowngrade,
+    OnDatabaseOpenFn? onOpen,
+    String? password,
     bool readOnly = false,
     bool singleInstance = true}) {
   final options = SqlCipherOpenDatabaseOptions(
@@ -148,7 +148,7 @@ Future<Database> openDatabase(String path,
 ///
 /// Open the database at a given path in read only mode
 ///
-Future<Database> openReadOnlyDatabase(String path, {String password}) =>
+Future<Database> openReadOnlyDatabase(String path, {String? password}) =>
     openDatabase(path, readOnly: true, password: password);
 
 ///

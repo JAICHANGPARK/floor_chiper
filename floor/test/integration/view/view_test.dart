@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:floor/floor.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sqflite_sqlcipher/sqflite.dart' as sqflite;
+import 'package:sqflite/sqflite.dart' as sqflite;
 
 import '../dao/dog_dao.dart';
 import '../dao/name_dao.dart';
@@ -29,10 +29,10 @@ abstract class ViewTestDatabase extends FloorDatabase {
 
 void main() {
   group('database tests', () {
-    ViewTestDatabase database;
-    PersonDao personDao;
-    DogDao dogDao;
-    NameDao nameDao;
+    late ViewTestDatabase database;
+    late PersonDao personDao;
+    late DogDao dogDao;
+    late NameDao nameDao;
 
     setUp(() async {
       database = await $FloorViewTestDatabase.inMemoryDatabaseBuilder().build();
@@ -67,6 +67,19 @@ void main() {
         final actual = await nameDao.findNamesLike('%eo');
 
         final expected = [Name('Leo'), Name('Romeo')];
+        expect(actual, equals(expected));
+      });
+
+      test('query view with double LIKE (reordered query params)', () async {
+        final persons = [Person(1, 'Leo'), Person(2, 'Frank')];
+        await personDao.insertPersons(persons);
+
+        final dog = Dog(1, 'Romeo', 'Rome', 1);
+        await dogDao.insertDog(dog);
+
+        final actual = await nameDao.findNamesMatchingBoth('L%', '%eo');
+
+        final expected = [Name('Leo')];
         expect(actual, equals(expected));
       });
 

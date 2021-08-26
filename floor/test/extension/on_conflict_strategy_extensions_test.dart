@@ -1,7 +1,7 @@
 import 'package:floor/floor.dart';
 import 'package:floor/src/extension/on_conflict_strategy_extensions.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sqflite_sqlcipher/sqflite.dart';
+import 'package:sqflite/sqflite.dart';
 
 void main() {
   group('asSqfliteConflictAlgorithm', () {
@@ -41,12 +41,6 @@ void main() {
       const onConflictStrategy = OnConflictStrategy.abort;
 
       final actual = onConflictStrategy.asSqfliteConflictAlgorithm();
-
-      expect(actual, equals(ConflictAlgorithm.abort));
-    });
-
-    test('falls back to abort when null', () {
-      final actual = null.asSqfliteConflictAlgorithm();
 
       expect(actual, equals(ConflictAlgorithm.abort));
     });

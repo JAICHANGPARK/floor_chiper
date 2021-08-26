@@ -12,11 +12,13 @@ import 'package:source_gen/source_gen.dart';
 import 'package:test/test.dart';
 
 void main() {
-  List<Entity> entities;
-  List<View> views;
+  late List<Entity> entities;
+  late List<View> views;
 
-  setUpAll(() async => entities = await _getEntities());
-  setUpAll(() async => views = await _getViews());
+  setUpAll(() async {
+    entities = await _getEntities();
+    views = await _getViews();
+  });
 
   test('Includes methods from abstract parent class', () async {
     final classElement = await _createDao('''
@@ -32,7 +34,7 @@ void main() {
       }
     ''');
 
-    final actual = DaoProcessor(classElement, '', '', entities, views)
+    final actual = DaoProcessor(classElement, '', '', entities, views, {})
         .process()
         .methodsLength;
 
@@ -59,7 +61,7 @@ void main() {
       }
     ''');
 
-    final actual = DaoProcessor(classElement, '', '', entities, views)
+    final actual = DaoProcessor(classElement, '', '', entities, views, {})
         .process()
         .methodsLength;
 
@@ -80,7 +82,7 @@ void main() {
       }
     ''');
 
-    final actual = DaoProcessor(classElement, '', '', entities, views)
+    final actual = DaoProcessor(classElement, '', '', entities, views, {})
         .process()
         .methodsLength;
 
@@ -101,7 +103,7 @@ void main() {
       }
     ''');
 
-    final actual = DaoProcessor(classElement, '', '', entities, views)
+    final actual = DaoProcessor(classElement, '', '', entities, views, {})
         .process()
         .methodsLength;
 
@@ -122,7 +124,7 @@ void main() {
       }
     ''');
 
-    final actual = DaoProcessor(classElement, '', '', entities, views)
+    final actual = DaoProcessor(classElement, '', '', entities, views, {})
         .process()
         .methodsLength;
 
@@ -150,7 +152,7 @@ void main() {
       ''');
 
     final processedDao =
-        DaoProcessor(classElement, '', '', entities, views).process();
+        DaoProcessor(classElement, '', '', entities, views, {}).process();
 
     expect(processedDao.methodsLength, equals(4));
     expect(processedDao.streamViews, equals(views));
@@ -196,7 +198,7 @@ Future<ClassElement> _createDao(final String dao) async {
       }
 
       ''', (resolver) async {
-    return LibraryReader(await resolver.findLibraryByName('test'));
+    return LibraryReader((await resolver.findLibraryByName('test'))!);
   });
 
   return library.classes.first;
@@ -218,12 +220,12 @@ Future<List<Entity>> _getEntities() async {
         Person(this.id, this.name);
       }
     ''', (resolver) async {
-    return LibraryReader(await resolver.findLibraryByName('test'));
+    return LibraryReader((await resolver.findLibraryByName('test'))!);
   });
 
   return library.classes
       .where((classElement) => classElement.hasAnnotation(annotations.Entity))
-      .map((classElement) => EntityProcessor(classElement).process())
+      .map((classElement) => EntityProcessor(classElement, {}).process())
       .toList();
 }
 
@@ -240,12 +242,12 @@ Future<List<View>> _getViews() async {
         Person(this.name);
       }
     ''', (resolver) async {
-    return LibraryReader(await resolver.findLibraryByName('test'));
+    return LibraryReader((await resolver.findLibraryByName('test'))!);
   });
 
   return library.classes
       .where((classElement) =>
           classElement.hasAnnotation(annotations.DatabaseView))
-      .map((classElement) => ViewProcessor(classElement).process())
+      .map((classElement) => ViewProcessor(classElement, {}).process())
       .toList();
 }

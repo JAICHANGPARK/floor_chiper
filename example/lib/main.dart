@@ -1,23 +1,13 @@
-import 'dart:io';
-import 'dart:typed_data';
-
-import 'package:floor_chiper/database.dart';
+import 'package:example/database.dart';
+import 'package:example/task.dart';
+import 'package:example/task_dao.dart';
 import 'package:flutter/material.dart';
-import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
-
-import 'package:permission_handler/permission_handler.dart';
-
-import 'package:sqflite_sqlcipher/sqflite.dart' as sqflite;
-
-import 'task.dart';
-import 'task_dao.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-//openDatabase("path",password: "");
+
   final database = await $FloorFlutterDatabase
-      .databaseBuilder('flutter_database.db', "myangel",)
+      .databaseBuilder('flutter_database.db')
       .build();
   final dao = database.taskDao;
 
@@ -42,70 +32,25 @@ class FloorApp extends StatelessWidget {
   }
 }
 
-class TasksWidget extends StatefulWidget {
+class TasksWidget extends StatelessWidget {
   final String title;
   final TaskDao dao;
 
   const TasksWidget({
-    Key key,
-    @required this.title,
-    @required this.dao,
+    Key? key,
+    required this.title,
+    required this.dao,
   }) : super(key: key);
 
   @override
-  _TasksWidgetState createState() => _TasksWidgetState();
-}
-
-class _TasksWidgetState extends State<TasksWidget> {
-
-  Future getPermission()async{
-    if (await Permission.storage.request().isGranted) {
-      // Either the permission was already granted before or the user just granted it.
-    }
-
-// You can request multiple permissions at once.
-    Map<Permission, PermissionStatus> statuses = await [
-      Permission.location,
-      Permission.storage,
-    ].request();
-
-    print(statuses[Permission.storage]);
-  }
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    getPermission();
-  }
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.title),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.close),
-            onPressed: ()async {
-              String path =await sqflite.getDatabasesPath();
-              path = join(path, 'flutter_database.db');
-              print(path);
-              File dbFile = File(path);
-              Uint8List dbData = await dbFile.readAsBytes();
-              Directory s = await getExternalStorageDirectory();
-              String outPath = s.path;
-              print(outPath);
-              outPath = join(s.path, "flutter_database.db");
-              print(outPath);
-              File file = File(outPath);
-              file =  await file.writeAsBytes(dbData);
-            },
-          )
-        ],),
+      appBar: AppBar(title: Text(title)),
       body: SafeArea(
         child: Column(
           children: <Widget>[
-            TasksListView(dao: widget.dao),
-            TasksTextField(dao: widget.dao),
+            TasksListView(dao: dao),
+            TasksTextField(dao: dao),
           ],
         ),
       ),
@@ -117,8 +62,8 @@ class TasksListView extends StatelessWidget {
   final TaskDao dao;
 
   const TasksListView({
-    Key key,
-    @required this.dao,
+    Key? key,
+    required this.dao,
   }) : super(key: key);
 
   @override
@@ -129,7 +74,7 @@ class TasksListView extends StatelessWidget {
         builder: (_, snapshot) {
           if (!snapshot.hasData) return Container();
 
-          final tasks = snapshot.data;
+          final tasks = snapshot.requireData;
 
           return ListView.builder(
             itemCount: tasks.length,
@@ -151,9 +96,9 @@ class TaskListCell extends StatelessWidget {
   final TaskDao dao;
 
   const TaskListCell({
-    Key key,
-    @required this.task,
-    @required this.dao,
+    Key? key,
+    required this.task,
+    required this.dao,
   }) : super(key: key);
 
   @override
@@ -172,8 +117,9 @@ class TaskListCell extends StatelessWidget {
       onDismissed: (_) async {
         await dao.deleteTask(task);
 
-        Scaffold.of(context).hideCurrentSnackBar();
-        Scaffold.of(context).showSnackBar(
+        final scaffoldMessengerState = ScaffoldMessenger.of(context);
+        scaffoldMessengerState.hideCurrentSnackBar();
+        scaffoldMessengerState.showSnackBar(
           const SnackBar(content: Text('Removed task')),
         );
       },
@@ -186,9 +132,9 @@ class TasksTextField extends StatelessWidget {
   final TaskDao dao;
 
   TasksTextField({
-    Key key,
-    @required this.dao,
-  })  : _textEditingController = TextEditingController(),
+    Key? key,
+    required this.dao,
+  })   : _textEditingController = TextEditingController(),
         super(key: key);
 
   @override
@@ -200,10 +146,10 @@ class TasksTextField extends StatelessWidget {
           Expanded(
             child: TextField(
               controller: _textEditingController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 fillColor: Colors.transparent,
                 filled: true,
-                contentPadding: const EdgeInsets.all(16),
+                contentPadding: EdgeInsets.all(16),
                 border: InputBorder.none,
                 hintText: 'Type task here',
               ),
@@ -214,8 +160,7 @@ class TasksTextField extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.only(right: 16),
-            child: OutlineButton(
-              textColor: Colors.blueGrey,
+            child: OutlinedButton(
               child: const Text('Save'),
               onPressed: () async {
                 await _persistMessage();

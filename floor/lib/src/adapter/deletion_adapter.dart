@@ -1,28 +1,23 @@
 import 'dart:async';
 
 import 'package:floor/src/util/primary_key_helper.dart';
-import 'package:sqflite_sqlcipher/sqflite.dart';
-
+import 'package:sqflite/sqflite.dart';
 
 class DeletionAdapter<T> {
   final DatabaseExecutor _database;
   final String _entityName;
   final List<String> _primaryKeyColumnNames;
-  final Map<String, dynamic> Function(T) _valueMapper;
-  final StreamController<String> _changeListener;
+  final Map<String, Object?> Function(T) _valueMapper;
+  final StreamController<String>? _changeListener;
 
   DeletionAdapter(
     final DatabaseExecutor database,
     final String entityName,
     final List<String> primaryKeyColumnName,
-    final Map<String, dynamic> Function(T) valueMapper, [
-    final StreamController<String> changeListener,
-  ])  : assert(database != null),
-        assert(entityName != null),
-        assert(entityName.isNotEmpty),
-        assert(primaryKeyColumnName != null),
+    final Map<String, Object?> Function(T) valueMapper, [
+    final StreamController<String>? changeListener,
+  ])  : assert(entityName.isNotEmpty),
         assert(primaryKeyColumnName.isNotEmpty),
-        assert(valueMapper != null),
         _database = database,
         _entityName = entityName,
         _primaryKeyColumnNames = primaryKeyColumnName,
@@ -56,9 +51,7 @@ class DeletionAdapter<T> {
         _valueMapper(item),
       ),
     );
-    if (_changeListener != null && result != 0) {
-      _changeListener.add(_entityName);
-    }
+    if (result != 0) _changeListener?.add(_entityName);
     return result;
   }
 
@@ -75,9 +68,7 @@ class DeletionAdapter<T> {
       );
     }
     final result = (await batch.commit(noResult: false)).cast<int>();
-    if (_changeListener != null && result.isNotEmpty) {
-      _changeListener.add(_entityName);
-    }
+    if (result.isNotEmpty) _changeListener?.add(_entityName);
     return result.isNotEmpty
         ? result.reduce((sum, element) => sum + element)
         : 0;

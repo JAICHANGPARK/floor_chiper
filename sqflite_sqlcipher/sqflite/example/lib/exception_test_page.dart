@@ -23,7 +23,7 @@ class ExceptionTestPage extends TestPage {
       try {
         await db.transaction((txn) async {
           await txn.rawInsert(
-              'INSERT INTO Test (name) VALUES (?)', <dynamic>['item']);
+              'INSERT INTO Test (name) VALUES (?)', <Object>['item']);
           var afterCount = Sqflite.firstIntValue(
               await txn.rawQuery('SELECT COUNT(*) FROM Test'));
           expect(afterCount, 1);
@@ -54,7 +54,7 @@ class ExceptionTestPage extends TestPage {
       await db.execute('CREATE TABLE Test (id INTEGER PRIMARY KEY, name TEXT)');
 
       var batch = db.batch();
-      batch.rawInsert('INSERT INTO Test (name) VALUES (?)', <dynamic>['item']);
+      batch.rawInsert('INSERT INTO Test (name) VALUES (?)', <Object>['item']);
       batch.execute('DUMMY CALL');
 
       var hasFailed = true;
@@ -99,7 +99,7 @@ class ExceptionTestPage extends TestPage {
       }
 
       try {
-        await db.rawQuery('malformed query with args ?', <dynamic>[1]);
+        await db.rawQuery('malformed query with args ?', <Object>[1]);
         fail(); // should fail before
       } on DatabaseException catch (e) {
         verify(e.isSyntaxError());
@@ -392,38 +392,6 @@ class ExceptionTestPage extends TestPage {
       }
     });
 
-    test('Bind null argument', () async {
-      // await Sqflite.devSetDebugModeOn(true);
-      var path = await initDeleteDb('bind_null_failed.db');
-      var db = await openDatabase(path);
-
-      await db.execute('CREATE TABLE Test (name TEXT)');
-
-      //await db.rawInsert("INSERT INTO Test (name) VALUES (\"?\")", [null]);
-      try {
-        await db.rawInsert('INSERT INTO Test (name) VALUES (?)', [null]);
-      } on DatabaseException catch (e) {
-        print('ERR: $e');
-        expect(e.toString().contains("sql 'INSERT"), true);
-      }
-
-      try {
-        await db.rawQuery('SELECT * FROM Test WHERE name = ?', [null]);
-      } on DatabaseException catch (e) {
-        print('ERR: $e');
-        expect(e.toString().contains("sql 'SELECT * FROM Test"), true);
-      }
-
-      try {
-        await db.rawDelete('DELETE FROM Test WHERE name = ?', [null]);
-      } on DatabaseException catch (e) {
-        print('ERR: $e');
-        expect(e.toString().contains("sql 'DELETE FROM Test"), true);
-      }
-
-      await db.close();
-    });
-
     test('Bind no parameter', () async {
       // await Sqflite.devSetDebugModeOn(true);
       var path = await initDeleteDb('bind_no_parameter_failed.db');
@@ -518,8 +486,8 @@ class ExceptionTestPage extends TestPage {
           await db2.execute('ROLLBACK');
         } catch (_) {}
       } finally {
-        await db1?.close();
-        await db2?.close();
+        await db1.close();
+        await db2.close();
       }
     });
   }

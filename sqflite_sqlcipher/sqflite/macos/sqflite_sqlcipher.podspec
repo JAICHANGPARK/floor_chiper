@@ -13,11 +13,15 @@ Access SQLite database.
   s.author           = { 'David' => 'davidmartos96@gmail.com' }
   s.source           = { :path => '.' }
   s.source_files     = 'Classes/**/*'
+  s.public_header_files = 'Classes/**/*.h'
   s.dependency 'FlutterMacOS'
   s.dependency 'FMDB/SQLCipher', '~> 2.7.5'
-  s.dependency 'SQLCipher', '4.4.0'
+  s.dependency 'SQLCipher', '4.4.2'
 
   s.platform = :osx, '10.11'
-  s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES' }
+  s.pod_target_xcconfig = { 
+    'DEFINES_MODULE' => 'YES',
+    'HEADER_SEARCH_PATHS' => 'SQLCipher'
+  }
   s.swift_version = '5.0'
 end
