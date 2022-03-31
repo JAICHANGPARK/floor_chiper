@@ -22,16 +22,16 @@ dependencies:
   floor_annotation:
     path: ../floor_annotation/
 
-  meta: ^1.2.3
+  meta: ^1.7.0
 
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  collection: ^1.14.13
-  mockito: ^4.1.1
-  matcher: ^0.12.9
-  build_runner: ^1.10.3
+  collection: ^1.16.0
+  mockito: ^5.1.0
+  matcher: ^0.12.11
+  build_runner: ^2.1.8
 
   floor_generator:
     path: ../floor_generator/
